@@ -8,5 +8,8 @@
     "dev": "nodemon index.js"
   },
   "author": "Umesh Singh Mehta/Vaibhav Tyagi",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
