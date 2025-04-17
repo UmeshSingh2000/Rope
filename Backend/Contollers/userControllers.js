@@ -1,6 +1,8 @@
 const checkEmail = require("../Utils/helperFunction.js");
 const bcrypt = require('bcrypt');
 
+const User = require('../models/userSchema')
+const bcrypt = require('bcrypt');
 
 /**
  * @description User login controller
@@ -9,10 +11,29 @@ const bcrypt = require('bcrypt');
  */
 const userLogin = async (req, res) => {
     
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "Please fill all the fields" });
-  }
+    try {
+        const { email, password } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+        if (!password) {
+            return res.status(400).json({ message: "Password is required" });
+        }
+        const isUserExists = await User.findOne({ email });
+        if (!isUserExists) {
+            return res.status(400).json({ message: "User does not exists with this Email" });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, isUserExists.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: "Incorrect Password" });
+        }
+
+        return res.status(200).json({ message: "Login Success" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Internal server error",err });
+    }
 };
 
 const userSignup = async (req, res) => {
