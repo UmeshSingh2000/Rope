@@ -7,9 +7,12 @@ const makeDbConnection = require('./Configuration/dbConnections')
 makeDbConnection();
 
 
+app.use(express.json());
 
 /**
  * @description middleWares
+*/
+app.use(express.json());
 */
 app.use(express.json());
 app.use(cors({
