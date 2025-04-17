@@ -49,7 +49,12 @@ const sendMail = async ({ to, subject, html }) => {
   }
 }
 
+const generateOTP = () => {
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  return otp;
+}
 
 
 
-module.exports = { checkEmail, generateToken, sendMail };
+
+module.exports = { checkEmail, generateToken, sendMail, generateOTP };

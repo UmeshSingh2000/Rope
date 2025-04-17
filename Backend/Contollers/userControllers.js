@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/userSchema')
 const fs = require('fs')
 const path = require('path')
+const { generateOTP } = require('../Utils/helperFunction.js');
+const { log } = require('console');
 
 /**
  * @description User login controller
@@ -112,16 +114,27 @@ const forgetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User does not exists with this Email" });
     }
+    const otp = generateOTP();
+    const expiresIn = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    await User.findByIdAndUpdate(user._id, {
+      OTP: otp,
+      OTPExpiresIn: expiresIn
+    });
+   
     const template = fs.readFileSync(path.join(__dirname, '../Template/OTPTemplate.html'), 'utf-8')
+    const html = template.replace("{{OTP}}",otp);
+   
     await sendMail({
       to: email,
       subject: "Forget Password",
-      html: template
+      html
     })
+   
     return res.status(200).json({ message: "Email sent successfully" });
   }
   catch (err) {
-    return res.status(500).json({ message: "Internal server error", err });
+    return res.status(500).json({ message: "Internal server error", error:err.message });
   }
 }
 
