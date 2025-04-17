@@ -17,7 +17,15 @@ const userSchema = new mongoose.Schema({
     },
     profilePhoto: {
         type: String
-    }
+    },
+    OTP: {
+        type: String,
+        default: null
+    },
+    OTPExpiresIn: {
+        type: Date,
+        default: null
+      }
 }, { timestamps: true });
 
 const User=mongoose.model("User",userSchema);
