@@ -9,7 +9,6 @@ const User = require('../models/userSchema')
  * @access Public
  */
 const userLogin = async (req, res) => {
-    
     try {
         const { email, password } = req.body;
         if (!email) {
@@ -33,7 +32,8 @@ const userLogin = async (req, res) => {
     catch (err) {
         return res.status(500).json({ message: "Internal server error",err });
     }
-};
+}
+
 
 const userSignup = async (req, res) => {
   try {
