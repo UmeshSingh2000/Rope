@@ -11,7 +11,8 @@ app.use(express.json());
 
 /**
  * @description middleWares
- */
+*/
+app.use(express.json());
 app.use(cors({
     origin: process.env.ORIGIN,
 }));
