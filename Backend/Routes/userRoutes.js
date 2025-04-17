@@ -7,7 +7,7 @@ const router = express.Router();
  * @route POST api/userLogin
  */
 
-router.get('/userLogin',(req,res)=>{
+router.post('/userLogin',(req,res)=>{
     res.send('User Route')
 })
 
