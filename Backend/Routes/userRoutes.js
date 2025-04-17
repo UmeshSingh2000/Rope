@@ -1,5 +1,10 @@
 const express = require('express')
 const router = express.Router();
+const {
+    userLogin
+} = require('../Contollers/userControllers')
+
+
 
 
 /**
@@ -7,9 +12,7 @@ const router = express.Router();
  * @route POST api/userLogin
  */
 
-router.post('/userLogin',(req,res)=>{
-    res.send('User Route')
-})
+router.post('/userLogin', userLogin)
 
 
 module.exports = router;
