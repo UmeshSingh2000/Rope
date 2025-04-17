@@ -10,12 +10,11 @@ makeDbConnection();
 
 /**
  * @description middleWares
- */
+*/
+app.use(express.json());
 app.use(cors({
     origin: process.env.ORIGIN,
 }));
-app.use(express.json());
-
 
 /**
  * @description Routes
