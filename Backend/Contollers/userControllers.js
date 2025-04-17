@@ -1,8 +1,7 @@
 const checkEmail = require("../Utils/helperFunction.js");
 const bcrypt = require('bcrypt');
-
 const User = require('../models/userSchema')
-const bcrypt = require('bcrypt');
+
 
 /**
  * @description User login controller
