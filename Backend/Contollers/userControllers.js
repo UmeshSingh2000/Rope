@@ -54,7 +54,11 @@ const userLogin = async (req, res) => {
   }
 }
 
-
+/**
+ * @description User Signup controller
+ * @route POST api/userSignup
+ * @access Public
+ */
 const userSignup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -101,6 +105,12 @@ const userSignup = async (req, res) => {
   }
 };
 
+
+/**
+ * @description User forgetPassword controller
+ * @route POST api/forgetPassword
+ * @access Private
+ */
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
   if (!email) {
@@ -115,7 +125,7 @@ const forgetPassword = async (req, res) => {
       return res.status(400).json({ message: "User does not exists with this Email" });
     }
     const otp = generateOTP();
-    const expiresIn = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    const expiresIn = new Date(Date.now() + 5 * 60 * 1000); 
 
     await User.findByIdAndUpdate(user._id, {
       OTP: otp,
