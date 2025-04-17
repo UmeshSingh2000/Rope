@@ -1,10 +1,12 @@
 const {
   checkEmail,
-  generateToken
+  generateToken,
+  sendMail
 } = require('../Utils/helperFunction.js')
 const bcrypt = require('bcrypt');
 const User = require('../models/userSchema')
-
+const fs = require('fs')
+const path = require('path')
 
 /**
  * @description User login controller
@@ -40,7 +42,7 @@ const userLogin = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path : '/',
+      path: '/',
       maxAge: 1000 * 60 * 60 * 24 // 1 day
     })
     return res.status(200).json({ message: "Login Success" });
@@ -97,8 +99,35 @@ const userSignup = async (req, res) => {
   }
 };
 
+const forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+  if (!checkEmail(email)) {
+    return res.status(400).json({ message: "Please enter a valid email address" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User does not exists with this Email" });
+    }
+    const template = fs.readFileSync(path.join(__dirname, '../Template/OTPTemplate.html'), 'utf-8')
+    await sendMail({
+      to: email,
+      subject: "Forget Password",
+      html: template
+    })
+    return res.status(200).json({ message: "Email sent successfully" });
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", err });
+  }
+}
+
 
 module.exports = {
   userLogin,
-  userSignup
+  userSignup,
+  forgetPassword
 };

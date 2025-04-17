@@ -2,9 +2,10 @@ const express = require('express')
 const router = express.Router();
 const {
     userLogin,
-    userSignup
+    userSignup,
+    forgetPassword
 } = require('../Contollers/userControllers');
-const authenticateToken = require('../Middlewares/JWT');
+// const authenticateToken = require('../Middlewares/JWT');
 
 
 /**
@@ -14,8 +15,6 @@ const authenticateToken = require('../Middlewares/JWT');
 
 router.post('/userLogin', userLogin) // route to login user
 router.post('/userSignup', userSignup) // route to signup user
-router.get('/home',authenticateToken, (req, res) => {
-    res.json({ message: "Home" });
-})
+router.post('/forgetPassword', forgetPassword); // route to send mail to user for forget password
 
 module.exports = router;
