@@ -1,4 +1,7 @@
-const checkEmail = require("../Utils/helperFunction.js");
+const {
+  checkEmail,
+  generateToken
+} = require('../Utils/helperFunction.js')
 const bcrypt = require('bcrypt');
 const User = require('../models/userSchema')
 
@@ -9,29 +12,42 @@ const User = require('../models/userSchema')
  * @access Public
  */
 const userLogin = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email) {
-            return res.status(400).json({ message: "Email is required" });
-        }
-        if (!password) {
-            return res.status(400).json({ message: "Password is required" });
-        }
-        const isUserExists = await User.findOne({ email });
-        if (!isUserExists) {
-            return res.status(400).json({ message: "User does not exists with this Email" });
-        }
-
-        const isPasswordCorrect = await bcrypt.compare(password, isUserExists.password);
-        if (!isPasswordCorrect) {
-            return res.status(400).json({ message: "Incorrect Password" });
-        }
-
-        return res.status(200).json({ message: "Login Success" });
+  try {
+    const { email, password } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
     }
-    catch (err) {
-        return res.status(500).json({ message: "Internal server error",err });
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
     }
+    if (!checkEmail(email)) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
+    }
+    const isUserExists = await User.findOne({ email });
+    if (!isUserExists) {
+      return res.status(400).json({ message: "User does not exists with this Email" });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, isUserExists.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Incorrect Password" });
+    }
+    const token = generateToken({
+      id: isUserExists._id,
+      name: isUserExists.name,
+    });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path : '/',
+      maxAge: 1000 * 60 * 60 * 24 // 1 day
+    })
+    return res.status(200).json({ message: "Login Success" });
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", err });
+  }
 }
 
 
@@ -66,7 +82,7 @@ const userSignup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    await User.create({
       name,
       email,
       password: hashedPassword,

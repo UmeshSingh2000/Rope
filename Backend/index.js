@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const cookieParser = require('cookie-parser')
 const app = express();
 const userRoutes = require('./Routes/userRoutes')
 const makeDbConnection = require('./Configuration/dbConnections')
@@ -8,7 +9,7 @@ makeDbConnection();
 
 
 app.use(express.json());
-
+app.use(cookieParser())
 /**
  * @description middleWares
 */
