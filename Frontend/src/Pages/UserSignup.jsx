@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-const URL=import.meta.env.VITE_BACKENDAPI_URL
+import Loader from '@/components/Loader/Loader'
+const URL = import.meta.env.VITE_BACKENDAPI_URL
 
 const UserSignup = () => {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ const UserSignup = () => {
 
     try {
       const { name, email, password } = formData;
-      if (!name ) {
+      if (!name) {
         toast.error('Please Enter Your Name.');
         return;
       }
@@ -45,16 +46,17 @@ const UserSignup = () => {
       }
       const response = await axios.post(`${URL}/userSignup`, formData);
 
-      
-      if(response.status===201){
+
+      if (response.status === 201) {
         toast.success('Signup successful! Please log in.');
         navigate('/');
       }
     } catch (error) {
-      
       toast.error(error.response.data.message || 'An error occurred. Please try again.');
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 5000)
     }
   }
 
@@ -104,13 +106,15 @@ const UserSignup = () => {
                 className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
             </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-xl shadow-md"
-            >
-              Sign Up
-            </Button>
+            {
+              loading ? <div className='flex justify-center'><Loader /></div> :
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-xl shadow-md"
+                >
+                  Sign Up
+                </Button>
+            }
 
             <div className="text-center text-sm text-zinc-400 mt-4">
               Already have an account?{' '}
