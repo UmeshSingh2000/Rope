@@ -4,7 +4,7 @@ const {
   sendMail
 } = require('../Utils/helperFunction.js')
 const bcrypt = require('bcrypt');
-const User = require('../models/userSchema')
+const User = require('../models/userSchema.js')
 const fs = require('fs')
 const path = require('path')
 const { generateOTP } = require('../Utils/helperFunction.js');
@@ -125,32 +125,82 @@ const forgetPassword = async (req, res) => {
       return res.status(400).json({ message: "User does not exists with this Email" });
     }
     const otp = generateOTP();
-    const expiresIn = new Date(Date.now() + 5 * 60 * 1000); 
+    const expiresIn = new Date(Date.now() + 5 * 60 * 1000);
 
     await User.findByIdAndUpdate(user._id, {
       OTP: otp,
       OTPExpiresIn: expiresIn
     });
-   
+
     const template = fs.readFileSync(path.join(__dirname, '../Template/OTPTemplate.html'), 'utf-8')
-    const html = template.replace("{{OTP}}",otp);
-   
+    const html = template.replace("{{OTP}}", otp);
+
     await sendMail({
       to: email,
       subject: "Forget Password",
       html
     })
-   
+
     return res.status(200).json({ message: "Email sent successfully" });
   }
   catch (err) {
-    return res.status(500).json({ message: "Internal server error", error:err.message });
+    return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 }
+
+
+/**
+ * @description Verify OTP
+ * @route POST api/forgetPassword/verifyOTP
+ * @access Public
+ */
+
+const verifyOTP = async (req, res) => {
+  try {
+
+    const { OTP } = req.body;
+    if (!OTP) {
+      return res.status(400).json({ message: "OTP is required" })
+    }
+    const { id } = req.user;
+    if (!id) {
+      return res.status(400).json({ message: "User id is required" })
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).json({ message: "User does not exists" })
+    }
+
+    if (user.OTP !== OTP) {
+      return res.status(400).json({ message: "Invalid OTP" })
+    }
+    const currentTime = new Date();
+    if (currentTime > user.OTPExpiresIn) {
+      return res.status(400).json({ message: "OTP has expired" })
+    }
+    await user.updateOne({
+      $unset: {
+        OTP: null,
+        OTPExpiresIn: null
+      }
+    })
+    return res.status(200).json({ message: "OTP verified successfully" })
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+}
+
+
+
+
+
 
 
 module.exports = {
   userLogin,
   userSignup,
-  forgetPassword
+  forgetPassword,
+  verifyOTP
 };
