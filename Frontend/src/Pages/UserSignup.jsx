@@ -54,9 +54,9 @@ const UserSignup = () => {
     } catch (error) {
       toast.error(error.response.data.message || 'An error occurred. Please try again.');
     } finally {
-      setTimeout(() => {
+      
         setLoading(false);
-      }, 5000)
+      
     }
   }
 
