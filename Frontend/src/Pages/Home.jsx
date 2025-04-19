@@ -1,11 +1,171 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPaperPlane,
+  faPhone,
+  faVideo,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
+import bgImage from "../assets/image.jpg"; // Adjust the path as necessary
 
-const Home = () => {
+const members = [
+  { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
+  { name: "Jackson Lee", email: "p@example.com", role: "Member" },
+  { name: "Isabella Nguyen", email: "i@example.com", role: "Member" },
+];
+
+export default function Home() {
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
-    <div>
-      Home Page
-    </div>
-  )
-}
+    <div className="flex h-screen items-center justify-center bg-black px-2">
+      
+      <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
 
-export default Home
+        {/* Left Panel */}
+        <div
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat && isMobile ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"
+          }`}
+        >
+          <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
+            {/* Chats */}
+            <div className="p-4 border-b border-gray-800">
+              <h2 className="text-lg font-semibold mb-4">Chats</h2>
+              <div className="p-4">
+              <input
+                type="text"
+                placeholder="Search chats..."
+                className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+                
+              />
+            </div>
+              <div className="space-y-4">
+                {members.map((member, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                    onClick={() => setSelectedChat(member)}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-600" />
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{member.name}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {member.email}
+                      </p>
+                    </div>
+                    <span className="ml-auto text-xs text-gray-500">
+                      {member.role}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Groups */}
+            <div className="p-4 overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-4">Groups</h2>
+              <div className="p-4">
+              <input
+                type="text"
+                placeholder="Search groups..."
+                className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+                
+              />
+            </div>
+              <div className="space-y-4">
+                {members.map((member, i) => (
+                  <div key={i} className="flex items-center space-x-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-600" />
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{member.name}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {member.email}
+                      </p>
+                    </div>
+                    <span className="ml-auto text-xs text-gray-500">
+                      {member.role}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel */}
+        <div
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"
+          }`}
+        >
+          {selectedChat && (
+            <div className="flex flex-col h-full p-4 sm:p-6">
+              {/* Header */}
+              <div className="flex items-center pb-4 border-b border-gray-800">
+                {isMobile && (
+                  <button
+                    className="mr-4 text-gray-400"
+                    onClick={() => setSelectedChat(null)}
+                  >
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                  </button>
+                )}
+                <div className="w-10 h-10 rounded-full bg-gray-600" />
+                <div className="ml-3 overflow-hidden">
+                  <p className="font-semibold truncate">{selectedChat.name}</p>
+                  <p className="text-sm text-gray-400 truncate">
+                    {selectedChat.email}
+                  </p>
+                </div>
+                <div className="ml-auto flex gap-4 text-gray-400 text-lg">
+                  <FontAwesomeIcon icon={faPhone} />
+                  <FontAwesomeIcon icon={faVideo} />
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-1">
+                <div className="bg-[#2a2a2a] p-3 rounded-xl max-w-xs w-fit">
+                  Hi, how can I help you today?
+                </div>
+                <div className="bg-blue-600 p-3 rounded-xl self-end text-white max-w-xs w-fit">
+                  Hey, I'm having trouble with my account.
+                </div>
+                <div className="bg-[#2a2a2a] p-3 rounded-xl max-w-xs w-fit">
+                  What seems to be the problem?
+                </div>
+                <div className="bg-blue-600 p-3 rounded-xl self-end text-white max-w-xs w-fit">
+                  I can't log in.
+                </div>
+              </div>
+
+              {/* Input */}
+              <div className="mt-4 flex items-center">
+                <input
+                  type="text"
+                  placeholder="Type your message..."
+                  className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
+                />
+                <button className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-full text-white">
+                  <FontAwesomeIcon icon={faPaperPlane} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
