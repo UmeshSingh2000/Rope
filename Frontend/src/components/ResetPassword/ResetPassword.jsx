@@ -155,13 +155,16 @@ const ResetPassword = () => {
               onChange={(e) => setData({ ...data, ["OTP"]: e.target.value })}
               disabled={!verifyOTPButtonState}
             />
+            {
+              loading ? <div className='flex justify-center'><Loader /></div> :
             <Button
-              className={`w-full cursor-pointer ${verifyOTPButtonState ? "block" : "hidden"
-                }`}
+            className={`w-full cursor-pointer ${verifyOTPButtonState ? "block" : "hidden"
+              }`}
               onClick={handleVerifyOTP}
-            >
-              {loading ? <div className='flex justify-center'><Loader /></div> : "Verify OTP"}
+              >
+              Verify OTP
             </Button>
+            }
 
             <Input
               className={`${passwordState ? "block" : "hidden"}`}
@@ -183,13 +186,16 @@ const ResetPassword = () => {
               }
               disabled={!passwordState}
             />
+            {
+              loading ? <div className='flex justify-center'><Loader /></div> :
             <Button
-              className={`w-full cursor-pointer ${passwordState ? "block" : "hidden"
-                }`}
+            className={`w-full cursor-pointer ${passwordState ? "block" : "hidden"
+              }`}
               onClick={handleChangePassword}
-            >
-              {loading ? <div className='flex justify-center'><Loader /></div> : "Confirm Change Password"}
+              >
+              Confirm Change Password
             </Button>
+            }
           </div>
         </DialogContent>
       </Dialog>
