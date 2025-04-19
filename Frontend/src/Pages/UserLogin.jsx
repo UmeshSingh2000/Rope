@@ -5,6 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import ResetPassword from "@/components/ResetPassword/ResetPassword";
+import Loader from "@/components/Loader/Loader";
+
 
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -28,6 +31,16 @@ const UserLogin = () => {
         return;
       }
 
+      const response = await axios.post(
+        `${URL}/userLogin`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
       const response = await axios.post(`${URL}/userLogin`, {
         email,
         password,
@@ -42,6 +55,12 @@ const UserLogin = () => {
       }
     } catch (error) {
       if (!error.response) {
+        toast.error("Can't connect to server. Please try again later.");
+      } else if (error.response.status >= 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        toast.error(error.response.data.message || "Login failed.");
+      }
         toast.error("Can't connect to server. Please try again later.")
       } else if (error.response.status >= 500) {
         toast.error('Server error. Please try again later.')
@@ -112,14 +131,17 @@ const UserLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <div className="text-right mt-2">
+              <div>
+                <ResetPassword />
+              </div>
+              {/* <div className="text-right mt-2">
                 <a
                   href="#"
                   className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Forgot password?
                 </a>
-              </div>
+              </div> */}
             </div>
 
             <Button
@@ -127,7 +149,7 @@ const UserLogin = () => {
               disabled={loading}
               className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-xl shadow-md"
             >
-              {loading ? "Logging in..." : "Log In"}
+              {loading ? <div className='flex justify-center'><Loader /></div>: "Log In"}
             </Button>
           </form>
 

@@ -151,23 +151,20 @@ const forgetPassword = async (req, res) => {
 
 /**
  * @description Verify OTP
- * @route POST api/forgetPassword/verifyOTP
+ * @route POST api/verifyOTP
  * @access Public
  */
 
 const verifyOTP = async (req, res) => {
   try {
 
-    const { OTP } = req.body;
+    const { OTP,email } = req.body;
     if (!OTP) {
       return res.status(400).json({ message: "OTP is required" })
     }
-    const { id } = req.user;
-    if (!id) {
-      return res.status(400).json({ message: "User id is required" })
-    }
+    
 
-    const user = await User.findById(id);
+    const user = await User.findOne({email});
     if (!user) {
       return res.status(400).json({ message: "User does not exists" })
     }
