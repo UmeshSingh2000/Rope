@@ -69,7 +69,7 @@ const UserLogin = () => {
       }
       catch (err) {
         if (err.response && err.response.status === 401) {
-          // Token is invalid or expired, do nothing
+          toast.error("Session expired. Please log in again.");
         } else {
           toast.error("Error verifying token. Please try again later.")
         }
