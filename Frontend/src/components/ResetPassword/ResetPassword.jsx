@@ -30,6 +30,7 @@ const ResetPassword = () => {
 
     if (!email) {
       toast.error("Please enter your email.");
+      return;
     }
     const response = await axios.post(
       `${URL}/forgetPassword`,
@@ -47,6 +48,7 @@ const ResetPassword = () => {
     const { OTP } = data;
     if (!OTP) {
       toast.error("Please enter your OTP.");
+      return;
     }
     const response = await axios.post(
       `${URL}/verifyOTP`,
@@ -64,9 +66,11 @@ const ResetPassword = () => {
       const { newPassword, confirmPassword } = data;
       if (!newPassword || !confirmPassword) {
         toast.error("Please enter your new password.");
+        return;
       }
       if (newPassword !== confirmPassword) {
         toast.error("Passwords do not match.");
+        return;
       }
       const response = await axios.post(
         `${URL}/resetPassword`,
