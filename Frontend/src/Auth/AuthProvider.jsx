@@ -10,6 +10,8 @@ const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [checked, setChecked] = useState(false);
+
     useEffect(() => {
         const checkToken = async () => {
             try {
@@ -22,12 +24,15 @@ export const AuthProvider = ({ children }) => {
             } catch (error) {
                 setIsAuthenticated(false)
             }
+            finally {
+                setChecked(true)
+            }
         }
         checkToken()
-    },[])
+    }, [])
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, checked }}>
             {children}
         </AuthContext.Provider>
 
