@@ -8,7 +8,6 @@ const User = require('../models/userSchema.js')
 const fs = require('fs')
 const path = require('path')
 const { generateOTP } = require('../Utils/helperFunction.js');
-const { log } = require('console');
 
 /**
  * @description User login controller
@@ -18,11 +17,8 @@ const { log } = require('console');
 const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-    if (!password) {
-      return res.status(400).json({ message: "Password is required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
     if (!checkEmail(email)) {
       return res.status(400).json({ message: "Please enter a valid email address" });
@@ -157,14 +153,13 @@ const forgetPassword = async (req, res) => {
 
 const verifyOTP = async (req, res) => {
   try {
-
-    const { OTP,email } = req.body;
+    const { OTP, email } = req.body;
     if (!OTP) {
       return res.status(400).json({ message: "OTP is required" })
     }
-    
 
-    const user = await User.findOne({email});
+
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exists" })
     }
@@ -189,6 +184,38 @@ const verifyOTP = async (req, res) => {
   }
 }
 
+/**
+ * @description Change Password
+ * @route POST api/changePassword
+ * @access Public
+ */
+
+const resetPassword = async (req, res) => {
+  try {
+
+    const { password, email } = req.body
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    if (!checkEmail(email)) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User does not exists" });
+    }
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+    return res.status(200).json({ message: "Password changed successfully" });
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+}
+
 
 
 
@@ -199,5 +226,6 @@ module.exports = {
   userLogin,
   userSignup,
   forgetPassword,
-  verifyOTP
+  verifyOTP,
+  resetPassword
 };
