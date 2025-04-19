@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import axios from "axios";
+import Loader from "@/components/Loader/Loader";
 
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -24,45 +25,65 @@ const ResetPassword = () => {
   const [sendOTPButtonState, setSendOTPButtonState] = useState(true);
   const [verifyOTPButtonState, setVerifyOTPButtonState] = useState(false);
   const [passwordState, setPasswordState] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleCheckEmail = async () => {
+    setLoading(true);
     const { email } = data;
-
-    if (!email) {
-      toast.error("Please enter your email.");
-      return;
+    try {
+      if (!email) {
+        toast.error("Please enter your email.");
+        return;
+      }
+      const response = await axios.post(
+        `${URL}/forgetPassword`,
+        { email },
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        toast.success("OTP sent to your email!");
+      }
+      setSendOTPButtonState(false);
+      setVerifyOTPButtonState(true);
+    } catch (error) {
+      toast.error(
+        error.response.data.message || "An error occurred. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-    const response = await axios.post(
-      `${URL}/forgetPassword`,
-      { email },
-      { withCredentials: true }
-    );
-    if (response.status === 200) {
-      toast.success("OTP sent to your email!");
-    }
-    setSendOTPButtonState(false);
-    setVerifyOTPButtonState(true);
   };
 
   const handleVerifyOTP = async () => {
-    const { OTP,email } = data;
-    if (!OTP) {
-      toast.error("Please enter your OTP.");
-      return;
-    }
-    const response = await axios.post(
-      `${URL}/verifyOTP`,
-      { OTP,email },
-      { withCredentials: true }
-    );
-    if (response.status === 200) {
-      toast.success("OTP verified successfully!");
-      setVerifyOTPButtonState(false);
-      setPasswordState(true);
+    setLoading(true);
+    try {
+      const { OTP, email } = data;
+      if (!OTP) {
+        toast.error("Please enter your OTP.");
+        return;
+      }
+      const response = await axios.post(
+        `${URL}/verifyOTP`,
+        { OTP, email },
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        toast.success("OTP verified successfully!");
+        setVerifyOTPButtonState(false);
+        setPasswordState(true);
+      }
+    } catch (error) {
+      toast.error(
+        error.response.data.message || "An error occurred. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
-    const handleChangePassword = async () => {
+  const handleChangePassword = async () => {
+    setLoading(true);
+    try {
       const { newPassword, confirmPassword } = data;
       if (!newPassword || !confirmPassword) {
         toast.error("Please enter your new password.");
@@ -80,6 +101,13 @@ const ResetPassword = () => {
       if (response.status === 200) {
         toast.success("Password changed successfully!");
       }
+    } catch (error) {
+      toast.error(
+        error.response.data.message || "An error occurred. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -114,16 +142,16 @@ const ResetPassword = () => {
               }`}
               onClick={handleCheckEmail}
             >
-              Send OTP
+               {loading?<div className='flex justify-center'><Loader /></div>:"Send OTP"}  
             </Button>
 
             <Input
-            className={`${
-              verifyOTPButtonState ? "block" : "hidden"}`}
+              // className={`${verifyOTPButtonState ? "block" : "hidden"}`}
               type="text"
               placeholder="Enter OTP"
               value={data.OTP}
               onChange={(e) => setData({ ...data, ["OTP"]: e.target.value })}
+              disabled={!verifyOTPButtonState}
             />
             <Button
               className={`w-full cursor-pointer ${
@@ -131,26 +159,27 @@ const ResetPassword = () => {
               }`}
               onClick={handleVerifyOTP}
             >
-              Verify OTP
+              {loading?<div className='flex justify-center'><Loader /></div>:"Verify OTP"}
             </Button>
 
-
             <Input
-            className={`${
-              passwordState ? "block" : "hidden"}`}
+              className={`${passwordState ? "block" : "hidden"}`}
               type="text"
               placeholder="Enter Your New Password"
               value={data.newPassword}
-              onChange={(e) => setData({ ...data, ["newPassword"]: e.target.value })}
+              onChange={(e) =>
+                setData({ ...data, ["newPassword"]: e.target.value })
+              }
               disabled={!passwordState}
             />
             <Input
-            className={`${
-              passwordState ? "block" : "hidden"}`}
+              className={`${passwordState ? "block" : "hidden"}`}
               type="text"
               placeholder="Confirm Password"
               value={data.confirmPassword}
-              onChange={(e) => setData({ ...data, ["confirmPassword"]: e.target.value })}
+              onChange={(e) =>
+                setData({ ...data, ["confirmPassword"]: e.target.value })
+              }
               disabled={!passwordState}
             />
             <Button
@@ -159,7 +188,7 @@ const ResetPassword = () => {
               }`}
               onClick={handleChangePassword}
             >
-              Confirm Change Password
+              {loading?<div className='flex justify-center'><Loader /></div>:"Confirm Change Password"}
             </Button>
           </div>
         </DialogContent>
