@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import ResetPassword from "@/components/ResetPassword/ResetPassword";
+import Loader from "@/components/Loader/Loader";
 
 
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
@@ -48,13 +49,10 @@ const UserLogin = () => {
       }
     } catch (error) {
       if (!error.response) {
-        // 🚨 Server is down or not reachable
         toast.error("Can't connect to server. Please try again later.");
       } else if (error.response.status >= 500) {
-        // 🔧 Server error (5xx)
         toast.error("Server error. Please try again later.");
       } else {
-        // ❌ Bad credentials or other client-side error
         toast.error(error.response.data.message || "Login failed.");
       }
     } finally {
@@ -117,7 +115,7 @@ const UserLogin = () => {
               disabled={loading}
               className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-xl shadow-md"
             >
-              {loading ? "Logging in..." : "Log In"}
+              {loading ? <div className='flex justify-center'><Loader /></div>: "Log In"}
             </Button>
           </form>
 

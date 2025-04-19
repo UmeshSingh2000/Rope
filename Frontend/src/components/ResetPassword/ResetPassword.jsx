@@ -45,14 +45,14 @@ const ResetPassword = () => {
   };
 
   const handleVerifyOTP = async () => {
-    const { OTP } = data;
+    const { OTP,email } = data;
     if (!OTP) {
       toast.error("Please enter your OTP.");
       return;
     }
     const response = await axios.post(
       `${URL}/verifyOTP`,
-      { OTP },
+      { OTP,email },
       { withCredentials: true }
     );
     if (response.status === 200) {
