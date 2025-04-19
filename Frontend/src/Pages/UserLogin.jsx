@@ -121,14 +121,6 @@ const UserLogin = () => {
               <div>
                 <ResetPassword />
               </div>
-              {/* <div className="text-right mt-2">
-                <a
-                  href="#"
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Forgot password?
-                </a>
-              </div> */}
             </div>
 
             <Button
