@@ -31,16 +31,6 @@ const UserLogin = () => {
         return;
       }
 
-      const response = await axios.post(
-        `${URL}/userLogin`,
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      );
       const response = await axios.post(`${URL}/userLogin`, {
         email,
         password,
@@ -60,12 +50,6 @@ const UserLogin = () => {
         toast.error("Server error. Please try again later.");
       } else {
         toast.error(error.response.data.message || "Login failed.");
-      }
-        toast.error("Can't connect to server. Please try again later.")
-      } else if (error.response.status >= 500) {
-        toast.error('Server error. Please try again later.')
-      } else {
-        toast.error(error.response.data.message || 'Login failed.')
       }
     } finally {
       setLoading(false);
