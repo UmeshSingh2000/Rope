@@ -39,7 +39,16 @@ const UserLogin = () => {
         navigate("/home");
       }
     } catch (error) {
-      toast.error("Invalid Credentials.");
+      if (!error.response) {
+      // 🚨 Server is down or not reachable
+      toast.error("Can't connect to server. Please try again later.")
+    } else if (error.response.status >= 500) {
+      // 🔧 Server error (5xx)
+      toast.error('Server error. Please try again later.')
+    } else {
+      // ❌ Bad credentials or other client-side error
+      toast.error(error.response.data.message || 'Login failed.')
+    }
     } finally {
       setLoading(false);
     }
