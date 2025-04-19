@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import UserLogin from "./Pages/UserLogin";
 import UserSignup from "./Pages/UserSignup";
+import Home from "./Pages/Home";
 import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById("root")).render(
@@ -12,6 +13,7 @@ createRoot(document.getElementById("root")).render(
     <Routes>
       <Route path="/" element={<UserLogin />} />
       <Route path="/userSignup" element={<UserSignup />} />
+      <Route path="/home" element={<Home />} />
     </Routes>
   </BrowserRouter>
 );
