@@ -4,7 +4,8 @@ const {
     userLogin,
     userSignup,
     forgetPassword,
-    verifyOTP
+    verifyOTP,
+    resetPassword
 } = require('../Controllers/userControllers');
 const authenticateToken = require('../Middlewares/JWT');
 // const authenticateToken = require('../Middlewares/JWT');
@@ -18,6 +19,7 @@ const authenticateToken = require('../Middlewares/JWT');
 router.post('/userLogin', userLogin) // route to login user
 router.post('/userSignup', userSignup) // route to signup user
 router.post('/forgetPassword', forgetPassword); // route to send mail to user for forget password
-router.post('/verifyOTP',verifyOTP); // route to verify OTP
+router.post('/verifyOTP', verifyOTP); // route to verify OTP
+router.post('/resetPassword', resetPassword)
 
 module.exports = router;
