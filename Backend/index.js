@@ -4,7 +4,8 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser')
 const app = express();
 const userRoutes = require('./Routes/userRoutes')
-const makeDbConnection = require('./Configuration/dbConnections')
+const makeDbConnection = require('./Configuration/dbConnections');
+const verifyTokenRoute = require('./Routes/verifyTokenRoute')
 makeDbConnection();
 
 
@@ -24,6 +25,8 @@ app.use(cors({
  * @route /api
  */
 app.use('/api', userRoutes);
+
+app.use('/api', verifyTokenRoute)
 
 
 

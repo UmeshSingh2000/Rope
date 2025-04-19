@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +31,7 @@ const UserLogin = () => {
       const response = await axios.post(`${URL}/userLogin`, {
         email,
         password,
-      },{
+      }, {
         withCredentials: true
       });
 
@@ -42,19 +42,38 @@ const UserLogin = () => {
       }
     } catch (error) {
       if (!error.response) {
-      // 🚨 Server is down or not reachable
-      toast.error("Can't connect to server. Please try again later.")
-    } else if (error.response.status >= 500) {
-      // 🔧 Server error (5xx)
-      toast.error('Server error. Please try again later.')
-    } else {
-      // ❌ Bad credentials or other client-side error
-      toast.error(error.response.data.message || 'Login failed.')
-    }
+        toast.error("Can't connect to server. Please try again later.")
+      } else if (error.response.status >= 500) {
+        toast.error('Server error. Please try again later.')
+      } else {
+        toast.error(error.response.data.message || 'Login failed.')
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const response = await axios.get(`${URL}/verifyToken`, {
+          withCredentials: true
+        })
+        if (response.status === 200) {
+          toast.success("Redirecting to home page...");
+          navigate("/home")
+        }
+      }
+      catch (err) {
+        if (err.response && err.response.status === 401) {
+          // Token is invalid or expired, do nothing
+        } else {
+          toast.error("Error verifying token. Please try again later.")
+        }
+      }
+    }
+    checkToken()
+  }, [])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black via-zinc-900 to-zinc-800 px-4">
