@@ -137,7 +137,7 @@ const forgetPassword = async (req, res) => {
       html
     })
 
-    return res.status(200).json({ message: "Email sent successfully" });
+    return res.status(200).json({ message: "OTP send to Your Email" });
   }
   catch (err) {
     return res.status(500).json({ message: "Internal server error", error: err.message });
