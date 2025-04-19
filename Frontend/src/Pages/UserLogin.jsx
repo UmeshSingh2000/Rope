@@ -31,6 +31,8 @@ const UserLogin = () => {
       const response = await axios.post(`${URL}/userLogin`, {
         email,
         password,
+      },{
+        withCredentials: true
       });
 
       if (response.status === 200) {
