@@ -12,6 +12,7 @@ import Loader from "@/components/Loader/Loader";
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
 const UserLogin = () => {
+  const { isAuthenticated, checked, setIsAuthenticated } = useAuth()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,6 +42,7 @@ const UserLogin = () => {
       if (response.status === 200) {
         toast.success("Login successful!");
 
+        setIsAuthenticated(true)
         navigate("/home");
       }
     } catch (error) {
@@ -57,30 +59,14 @@ const UserLogin = () => {
   };
 
   useEffect(() => {
-    const yourCookie = document.cookie.split(";").find(cookie => cookie.trim().startsWith("token="));
-    if (!yourCookie) return;
-    const checkToken = async () => {
-      try {
-        const response = await axios.get(`${URL}/verifyToken`, {
-          withCredentials: true
-        })
-        if (response.status === 200) {
-          toast.success("Redirecting to home page...");
-          navigate("/home")
-        }
-      }
-      catch (err) {
-        if (err.response && err.response.status === 401) {
-          toast.error("Session expired. Please log in again.");
-        } else {
-          toast.error("Error verifying token. Please try again later.")
-        }
-      }
+    if (!checked) return
+    if (isAuthenticated) {
+      toast.success("Login successfull. Redirecting to home page.....");
+      navigate('/home')
     }
-    checkToken()
-  }, [])
+  }, [isAuthenticated, checked])
 
-
+  if (!checked) return <div className="flex justify-center items-center h-screen"><Loader /></div>
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black via-zinc-900 to-zinc-800 px-4">
       <Card className="bg-zinc-900 border border-zinc-800 text-white w-full max-w-sm rounded-3xl shadow-2xl p-6 transition-all">
