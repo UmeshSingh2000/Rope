@@ -131,7 +131,7 @@ const UserLogin = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-xl shadow-md"
+              className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-md shadow-md cursor-pointer"
             >
               {loading ? <div className='flex justify-center'><Loader /></div>: "Log In"}
             </Button>

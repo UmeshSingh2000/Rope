@@ -72,7 +72,7 @@ const ResetPassword = () => {
   const handleChangePassword = async () => {
     setLoading(true);
     try {
-      const { newPassword, confirmPassword } = data;
+      const { newPassword, confirmPassword, email} = data;
       if (!newPassword || !confirmPassword) {
         toast.error("Please enter your new password.");
         return;
@@ -81,7 +81,7 @@ const ResetPassword = () => {
         toast.error("Passwords do not match.");
         return;
       }
-      const response = await axios.post(`${URL}/resetPassword`, { newPassword }, { withCredentials: true });
+      const response = await axios.post(`${URL}/resetPassword`, { password:newPassword ,email}, { withCredentials: true });
       if (response.status === 200) {
         toast.success(response.data.message);
         setData({ email: "", OTP: "", newPassword: "", confirmPassword: "" });
@@ -90,6 +90,7 @@ const ResetPassword = () => {
         setPasswordState(false);
       }
     } catch (error) {
+      console.error(error);
       toast.error(error?.response?.data?.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -122,7 +123,7 @@ const ResetPassword = () => {
               className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             {sendOTPButtonState && !loading && (
-              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl" onClick={handleCheckEmail}>
+              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md cursor-pointer" onClick={handleCheckEmail}>
                 Send OTP
               </Button>
             )}
@@ -137,7 +138,7 @@ const ResetPassword = () => {
                   className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {!loading && (
-                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl" onClick={handleVerifyOTP}>
+                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md cursor-pointer" onClick={handleVerifyOTP}>
                     Verify OTP
                   </Button>
                 )}
@@ -161,7 +162,7 @@ const ResetPassword = () => {
                   className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {!loading && (
-                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl" onClick={handleChangePassword}>
+                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md cursor-pointer" onClick={handleChangePassword}>
                     Confirm Change Password
                   </Button>
                 )}
