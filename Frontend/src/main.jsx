@@ -13,14 +13,22 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 // Add all solid icons to the library
 library.add(fas);
 
+import ProtectedRoute from "./Auth/ProtectedRoute";
+import { AuthProvider } from "./Auth/AuthProvider";
 
 createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <Toaster position="top-right" reverseOrder={false} />
-    <Routes>
-      <Route path="/" element={<UserLogin />} />
-      <Route path="/userSignup" element={<UserSignup />} />
-      <Route path="/home" element={<Home />} />
-    </Routes>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
+      <Routes>
+        <Route path="/" element={<UserLogin />} />
+        <Route path="/userSignup" element={<UserSignup />} />
+        <Route path="/home" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
 );

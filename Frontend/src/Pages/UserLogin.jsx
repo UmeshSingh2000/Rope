@@ -7,11 +7,14 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import ResetPassword from "@/components/ResetPassword/ResetPassword";
 import Loader from "@/components/Loader/Loader";
+import { useAuth } from "@/Auth/AuthProvider";
 
 
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
 const UserLogin = () => {
+  const { isAuthenticated } = useAuth()
+  console.log(isAuthenticated)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,6 @@ const UserLogin = () => {
 
       if (response.status === 200) {
         toast.success("Login successful!");
-
         navigate("/home");
       }
     } catch (error) {
@@ -57,28 +59,12 @@ const UserLogin = () => {
   };
 
   useEffect(() => {
-    const yourCookie = document.cookie.split(";").find(cookie => cookie.trim().startsWith("token="));
-    if (!yourCookie) return;
-    const checkToken = async () => {
-      try {
-        const response = await axios.get(`${URL}/verifyToken`, {
-          withCredentials: true
-        })
-        if (response.status === 200) {
-          toast.success("Redirecting to home page...");
-          navigate("/home")
-        }
-      }
-      catch (err) {
-        if (err.response && err.response.status === 401) {
-          toast.error("Session expired. Please log in again.");
-        } else {
-          toast.error("Error verifying token. Please try again later.")
-        }
-      }
+    if (!isAuthenticated) {
+      return
     }
-    checkToken()
-  }, [])
+    toast.success("Redirecting to Homepage....");
+    navigate('/home')
+  }, [isAuthenticated])
 
 
   return (
@@ -122,14 +108,16 @@ const UserLogin = () => {
                 <ResetPassword />
               </div>
             </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-md shadow-md cursor-pointer"
-            >
-              {loading ? <div className='flex justify-center'><Loader /></div> : "Log In"}
-            </Button>
+            {
+              loading ? <div className='flex justify-center'><Loader /></div> :
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-md shadow-md cursor-pointer"
+                >
+                  Log In
+                </Button>
+            }
           </form>
 
           <div className="text-center text-sm text-zinc-400 mt-4">
