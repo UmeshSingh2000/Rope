@@ -6,6 +6,13 @@ import UserLogin from "./Pages/UserLogin";
 import UserSignup from "./Pages/UserSignup";
 import Home from "./Pages/Home";
 import { Toaster } from "react-hot-toast";
+// App.js or index.js
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+
+// Add all solid icons to the library
+library.add(fas);
+
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
