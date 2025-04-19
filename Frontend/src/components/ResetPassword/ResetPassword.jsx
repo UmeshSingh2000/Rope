@@ -37,7 +37,7 @@ const ResetPassword = () => {
       }
       const response = await axios.post(`${URL}/forgetPassword`, { email }, { withCredentials: true });
       if (response.status === 200) {
-        toast.success("OTP sent to your email!");
+        toast.success(response.data.message);
         setSendOTPButtonState(false);
         setVerifyOTPButtonState(true);
       }
