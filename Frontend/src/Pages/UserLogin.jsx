@@ -57,6 +57,8 @@ const UserLogin = () => {
   };
 
   useEffect(() => {
+    const yourCookie = document.cookie.split(";").find(cookie => cookie.trim().startsWith("token="));
+    if (!yourCookie) return;
     const checkToken = async () => {
       try {
         const response = await axios.get(`${URL}/verifyToken`, {
@@ -77,6 +79,7 @@ const UserLogin = () => {
     }
     checkToken()
   }, [])
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black via-zinc-900 to-zinc-800 px-4">
@@ -133,7 +136,7 @@ const UserLogin = () => {
               disabled={loading}
               className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-xl shadow-md"
             >
-              {loading ? <div className='flex justify-center'><Loader /></div>: "Log In"}
+              {loading ? <div className='flex justify-center'><Loader /></div> : "Log In"}
             </Button>
           </form>
 
