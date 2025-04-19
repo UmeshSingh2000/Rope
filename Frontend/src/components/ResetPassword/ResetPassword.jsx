@@ -58,7 +58,7 @@ const ResetPassword = () => {
       }
       const response = await axios.post(`${URL}/verifyOTP`, { OTP, email }, { withCredentials: true });
       if (response.status === 200) {
-        toast.success("OTP verified successfully!");
+        toast.success(response.data.message);
         setVerifyOTPButtonState(false);
         setPasswordState(true);
       }
@@ -83,7 +83,7 @@ const ResetPassword = () => {
       }
       const response = await axios.post(`${URL}/resetPassword`, { newPassword }, { withCredentials: true });
       if (response.status === 200) {
-        toast.success("Password changed successfully!");
+        toast.success(response.data.message);
         setData({ email: "", OTP: "", newPassword: "", confirmPassword: "" });
         setSendOTPButtonState(true);
         setVerifyOTPButtonState(false);
