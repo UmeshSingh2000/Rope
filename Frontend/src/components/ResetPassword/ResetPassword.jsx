@@ -136,14 +136,16 @@ const ResetPassword = () => {
               }}
               disabled={!sendOTPButtonState}
             />
-            <Button
-              className={`w-full cursor-pointer ${
-                sendOTPButtonState ? "block" : "hidden"
-              }`}
-              onClick={handleCheckEmail}
-            >
-               {loading?<div className='flex justify-center'><Loader /></div>:"Send OTP"}  
-            </Button>
+            {
+              loading ? <div className="flex justify-center"><Loader /></div> :
+                <Button
+                  className={`w-full cursor-pointer ${sendOTPButtonState ? "block" : "hidden"
+                    }`}
+                  onClick={handleCheckEmail}
+                >
+                  Send OTP
+                </Button>
+            }
 
             <Input
               // className={`${verifyOTPButtonState ? "block" : "hidden"}`}
@@ -154,12 +156,11 @@ const ResetPassword = () => {
               disabled={!verifyOTPButtonState}
             />
             <Button
-              className={`w-full cursor-pointer ${
-                verifyOTPButtonState ? "block" : "hidden"
-              }`}
+              className={`w-full cursor-pointer ${verifyOTPButtonState ? "block" : "hidden"
+                }`}
               onClick={handleVerifyOTP}
             >
-              {loading?<div className='flex justify-center'><Loader /></div>:"Verify OTP"}
+              {loading ? <div className='flex justify-center'><Loader /></div> : "Verify OTP"}
             </Button>
 
             <Input
@@ -183,12 +184,11 @@ const ResetPassword = () => {
               disabled={!passwordState}
             />
             <Button
-              className={`w-full cursor-pointer ${
-                passwordState ? "block" : "hidden"
-              }`}
+              className={`w-full cursor-pointer ${passwordState ? "block" : "hidden"
+                }`}
               onClick={handleChangePassword}
             >
-              {loading?<div className='flex justify-center'><Loader /></div>:"Confirm Change Password"}
+              {loading ? <div className='flex justify-center'><Loader /></div> : "Confirm Change Password"}
             </Button>
           </div>
         </DialogContent>
