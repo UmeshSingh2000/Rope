@@ -35,20 +35,14 @@ const ResetPassword = () => {
         toast.error("Please enter your email.");
         return;
       }
-      const response = await axios.post(
-        `${URL}/forgetPassword`,
-        { email },
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${URL}/forgetPassword`, { email }, { withCredentials: true });
       if (response.status === 200) {
         toast.success("OTP sent to your email!");
+        setSendOTPButtonState(false);
+        setVerifyOTPButtonState(true);
       }
-      setSendOTPButtonState(false);
-      setVerifyOTPButtonState(true);
     } catch (error) {
-      toast.error(
-        error.response.data.message || "An error occurred. Please try again."
-      );
+      toast.error(error?.response?.data?.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -62,20 +56,14 @@ const ResetPassword = () => {
         toast.error("Please enter your OTP.");
         return;
       }
-      const response = await axios.post(
-        `${URL}/verifyOTP`,
-        { OTP, email },
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${URL}/verifyOTP`, { OTP, email }, { withCredentials: true });
       if (response.status === 200) {
         toast.success("OTP verified successfully!");
         setVerifyOTPButtonState(false);
         setPasswordState(true);
       }
     } catch (error) {
-      toast.error(
-        error.response.data.message || "An error occurred. Please try again."
-      );
+      toast.error(error?.response?.data?.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -93,36 +81,34 @@ const ResetPassword = () => {
         toast.error("Passwords do not match.");
         return;
       }
-      const response = await axios.post(
-        `${URL}/resetPassword`,
-        { newPassword },
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${URL}/resetPassword`, { newPassword }, { withCredentials: true });
       if (response.status === 200) {
         toast.success("Password changed successfully!");
+        setData({ email: "", OTP: "", newPassword: "", confirmPassword: "" });
+        setSendOTPButtonState(true);
+        setVerifyOTPButtonState(false);
+        setPasswordState(false);
       }
     } catch (error) {
-      toast.error(
-        error.response.data.message || "An error occurred. Please try again."
-      );
+      toast.error(error?.response?.data?.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="text-right">
+    <div className="text-right mt-2">
       <Dialog>
         <DialogTrigger asChild>
           <span className="text-xs text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">
             Forgot password?
           </span>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="bg-zinc-900 border border-zinc-800 text-white rounded-3xl shadow-2xl max-w-sm w-full">
           <DialogHeader>
-            <DialogTitle>Forgot your password?</DialogTitle>
-            <DialogDescription>
-              Enter your email and we’ll send you a reset link.
+            <DialogTitle className="text-xl font-bold text-white">Reset Password</DialogTitle>
+            <DialogDescription className="text-sm text-zinc-400">
+              Enter your email to receive an OTP and reset your password.
             </DialogDescription>
           </DialogHeader>
 
@@ -131,71 +117,62 @@ const ResetPassword = () => {
               type="email"
               placeholder="Enter your email"
               value={data.email}
-              onChange={(e) => {
-                setData({ ...data, ["email"]: e.target.value });
-              }}
+              onChange={(e) => setData({ ...data, email: e.target.value })}
               disabled={!sendOTPButtonState}
+              className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            {
-              loading ? <div className="flex justify-center"><Loader /></div> :
-                <Button
-                  className={`w-full cursor-pointer ${sendOTPButtonState ? "block" : "hidden"
-                    }`}
-                  onClick={handleCheckEmail}
-                >
-                  Send OTP
-                </Button>
-            }
+            {sendOTPButtonState && !loading && (
+              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl" onClick={handleCheckEmail}>
+                Send OTP
+              </Button>
+            )}
 
-            <Input
-              // className={`${verifyOTPButtonState ? "block" : "hidden"}`}
-              type="text"
-              placeholder="Enter OTP"
-              value={data.OTP}
-              onChange={(e) => setData({ ...data, ["OTP"]: e.target.value })}
-              disabled={!verifyOTPButtonState}
-            />
-            {
-              loading ? <div className='flex justify-center'><Loader /></div> :
-            <Button
-            className={`w-full cursor-pointer ${verifyOTPButtonState ? "block" : "hidden"
-              }`}
-              onClick={handleVerifyOTP}
-              >
-              Verify OTP
-            </Button>
-            }
+            {verifyOTPButtonState && (
+              <>
+                <Input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={data.OTP}
+                  onChange={(e) => setData({ ...data, OTP: e.target.value })}
+                  className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {!loading && (
+                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl" onClick={handleVerifyOTP}>
+                    Verify OTP
+                  </Button>
+                )}
+              </>
+            )}
 
-            <Input
-              className={`${passwordState ? "block" : "hidden"}`}
-              type="text"
-              placeholder="Enter Your New Password"
-              value={data.newPassword}
-              onChange={(e) =>
-                setData({ ...data, ["newPassword"]: e.target.value })
-              }
-              disabled={!passwordState}
-            />
-            <Input
-              className={`${passwordState ? "block" : "hidden"}`}
-              type="text"
-              placeholder="Confirm Password"
-              value={data.confirmPassword}
-              onChange={(e) =>
-                setData({ ...data, ["confirmPassword"]: e.target.value })
-              }
-              disabled={!passwordState}
-            />
-            {
-              loading ? <div className='flex justify-center'><Loader /></div> :
-            <Button
-            className={`w-full cursor-pointer ${passwordState ? "block" : "hidden"
-              }`}
-              onClick={handleChangePassword}
-              >
-              Confirm Change Password
-            </Button>
-            }
+            {passwordState && (
+              <>
+                <Input
+                  type="password"
+                  placeholder="Enter new password"
+                  value={data.newPassword}
+                  onChange={(e) => setData({ ...data, newPassword: e.target.value })}
+                  className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <Input
+                  type="password"
+                  placeholder="Confirm password"
+                  value={data.confirmPassword}
+                  onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
+                  className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {!loading && (
+                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl" onClick={handleChangePassword}>
+                    Confirm Change Password
+                  </Button>
+                )}
+              </>
+            )}
+
+            {loading && (
+              <div className="flex justify-center">
+                <Loader />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
