@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import ResetPassword from "@/components/ResetPassword/ResetPassword";
+
 
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -28,12 +30,16 @@ const UserLogin = () => {
         return;
       }
 
-      const response = await axios.post(`${URL}/userLogin`, {
-        email,
-        password,
-      },{
-        withCredentials: true
-      });
+      const response = await axios.post(
+        `${URL}/userLogin`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         toast.success("Login successful!");
@@ -42,15 +48,15 @@ const UserLogin = () => {
       }
     } catch (error) {
       if (!error.response) {
-      // 🚨 Server is down or not reachable
-      toast.error("Can't connect to server. Please try again later.")
-    } else if (error.response.status >= 500) {
-      // 🔧 Server error (5xx)
-      toast.error('Server error. Please try again later.')
-    } else {
-      // ❌ Bad credentials or other client-side error
-      toast.error(error.response.data.message || 'Login failed.')
-    }
+        // 🚨 Server is down or not reachable
+        toast.error("Can't connect to server. Please try again later.");
+      } else if (error.response.status >= 500) {
+        // 🔧 Server error (5xx)
+        toast.error("Server error. Please try again later.");
+      } else {
+        // ❌ Bad credentials or other client-side error
+        toast.error(error.response.data.message || "Login failed.");
+      }
     } finally {
       setLoading(false);
     }
@@ -93,14 +99,17 @@ const UserLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <div className="text-right mt-2">
+              <div>
+                <ResetPassword />
+              </div>
+              {/* <div className="text-right mt-2">
                 <a
                   href="#"
                   className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Forgot password?
                 </a>
-              </div>
+              </div> */}
             </div>
 
             <Button

@@ -18,6 +18,6 @@ const authenticateToken = require('../Middlewares/JWT');
 router.post('/userLogin', userLogin) // route to login user
 router.post('/userSignup', userSignup) // route to signup user
 router.post('/forgetPassword', forgetPassword); // route to send mail to user for forget password
-router.post('/verifyOTP',authenticateToken,verifyOTP); // route to verify OTP
+router.post('/verifyOTP',verifyOTP); // route to verify OTP
 
 module.exports = router;

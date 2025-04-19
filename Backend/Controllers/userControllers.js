@@ -151,7 +151,7 @@ const forgetPassword = async (req, res) => {
 
 /**
  * @description Verify OTP
- * @route POST api/forgetPassword/verifyOTP
+ * @route POST api/verifyOTP
  * @access Public
  */
 
