@@ -52,7 +52,13 @@ const UserSignup = () => {
         navigate('/');
       }
     } catch (error) {
-      toast.error(error.response.data.message || 'An error occurred. Please try again.');
+      if (!error.response) {
+        toast.error("Can't connect to server. Please try again later.");
+      } else if (error.response.status >= 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        toast.error(error.response.data.message || "Login failed.");
+      }
     } finally {
       
         setLoading(false);

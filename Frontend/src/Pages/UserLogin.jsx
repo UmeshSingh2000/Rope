@@ -7,12 +7,12 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import ResetPassword from "@/components/ResetPassword/ResetPassword";
 import Loader from "@/components/Loader/Loader";
-
+import { useAuth } from "@/Auth/AuthProvider";
 
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
 const UserLogin = () => {
-  const { isAuthenticated, checked, setIsAuthenticated } = useAuth()
+  const { isAuthenticated, checked, setIsAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,17 +32,21 @@ const UserLogin = () => {
         return;
       }
 
-      const response = await axios.post(`${URL}/userLogin`, {
-        email,
-        password,
-      }, {
-        withCredentials: true
-      });
+      const response = await axios.post(
+        `${URL}/userLogin`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
-        toast.success("Login successful!");
+        // toast.success("Login successful!");
 
-        setIsAuthenticated(true)
+        setIsAuthenticated(true);
         navigate("/home");
       }
     } catch (error) {
@@ -59,14 +63,19 @@ const UserLogin = () => {
   };
 
   useEffect(() => {
-    if (!checked) return
+    if (!checked) return;
     if (isAuthenticated) {
       toast.success("Login successfull. Redirecting to home page.....");
-      navigate('/home')
+      navigate("/home");
     }
-  }, [isAuthenticated, checked])
+  }, [isAuthenticated, checked]);
 
-  if (!checked) return <div className="flex justify-center items-center h-screen"><Loader /></div>
+  if (!checked)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
+      </div>
+    );
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black via-zinc-900 to-zinc-800 px-4">
       <Card className="bg-zinc-900 border border-zinc-800 text-white w-full max-w-sm rounded-3xl shadow-2xl p-6 transition-all">
@@ -109,13 +118,19 @@ const UserLogin = () => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-md shadow-md cursor-pointer"
-            >
-              {loading ? <div className='flex justify-center'><Loader /></div> : "Log In"}
-            </Button>
+            {loading ? (
+              <div className="flex justify-center">
+                <Loader />
+              </div>
+            ) : (
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all py-2 rounded-md shadow-md cursor-pointer"
+              >
+                Log In
+              </Button>
+            )}
           </form>
 
           <div className="text-center text-sm text-zinc-400 mt-4">
