@@ -6,6 +6,7 @@ import {
   faVideo,
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import logo from "../assets/Rope-Logo.png";
 
 const members = [
   { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
@@ -31,7 +32,10 @@ export default function Home() {
     <div className="flex h-screen items-center justify-center bg-black px-2">
       
       <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
-
+        
+        <div>
+          <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
+        </div>
         {/* Left Panel */}
         <div
           className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
@@ -41,7 +45,11 @@ export default function Home() {
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
             {/* Chats */}
             <div className="p-4 border-b border-gray-800">
-              <h2 className="text-lg font-semibold mb-4">Chats</h2>
+              <div className="flex justify-between">
+                <h2 className="text-lg font-semibold mb-4">Chats</h2>
+                {/* <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" /> */}
+                </div>
+              
               <div className="p-4">
               <input
                 type="text"
