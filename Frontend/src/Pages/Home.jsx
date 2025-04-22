@@ -6,7 +6,6 @@ import {
   faVideo,
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import bgImage from "../assets/image.jpg"; // Adjust the path as necessary
 
 const members = [
   { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
