@@ -32,6 +32,7 @@ export default function Home() {
     <div className="flex h-screen items-center justify-center bg-black px-2">
       
       <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
+        
 
         {/* Left Panel */}
         <div
@@ -42,7 +43,8 @@ export default function Home() {
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
             {/* Chats */}
             <div className="p-4 border-b border-gray-800">
-              <h2 className="text-lg font-semibold mb-4">Chats</h2>
+              <div className="flex justify-between"><h2 className="text-lg font-semibold mb-4">Chats</h2><p>logo</p></div>
+              
               <div className="p-4">
               <input
                 type="text"
