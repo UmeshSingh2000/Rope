@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema()
+const Schema = mongoose.Schema
 
 const mapper = new Schema({
-    user_id: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
     },
-    socket_id: {
+    socketId: {
         type: String,
         required: true,
         default:null

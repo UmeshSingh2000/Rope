@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer')
+const mongoose = require('mongoose')
 
 const generateToken = ({ id, name }) => {
   try {
@@ -55,6 +56,21 @@ const generateOTP = () => {
 }
 
 
+const checkValidMongooseId = (id) => {
+  if (!id) {
+    return false;
+  }
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  return isValid;
+}
 
 
-module.exports = { checkEmail, generateToken, sendMail, generateOTP };
+
+
+module.exports = {
+  checkEmail,
+  generateToken,
+  sendMail,
+  generateOTP,
+  checkValidMongooseId
+};
