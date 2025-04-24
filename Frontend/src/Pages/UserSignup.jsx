@@ -12,7 +12,8 @@ const UserSignup = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    userName: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +32,7 @@ const UserSignup = () => {
     setLoading(true);
 
     try {
-      const { name, email, password } = formData;
+      const { name, email, password, userName } = formData;
       if (!name) {
         toast.error('Please Enter Your Name.');
         return;
@@ -42,6 +43,10 @@ const UserSignup = () => {
       }
       if (!password) {
         toast.error('Please Enter Your Password.');
+        return;
+      }
+      if (!userName) {
+        toast.error('Please Enter Username.');
         return;
       }
       const response = await axios.post(`${URL}/userSignup`, formData);
@@ -60,9 +65,9 @@ const UserSignup = () => {
         toast.error(error.response.data.message || "Login failed.");
       }
     } finally {
-      
-        setLoading(false);
-      
+
+      setLoading(false);
+
     }
   }
 
@@ -78,15 +83,27 @@ const UserSignup = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <CardContent className="p-0 space-y-5">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1">Full Name</label>
-              <Input
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="John Doe"
-                className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              />
+            <div className='flex gap-2'>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-1">Full Name</label>
+                <Input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-1">UserName</label>
+                <Input
+                  name="userName"
+                  value={formData.userName}
+                  onChange={handleChange}
+                  placeholder="John123"
+                  className="bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                />
+              </div>
             </div>
 
             <div>

@@ -24,7 +24,7 @@ const UserLogin = () => {
 
     try {
       if (!email) {
-        toast.error("Please enter your email.");
+        toast.error("Please enter your Email or UserName.");
         return;
       }
       if (!password) {
@@ -92,7 +92,7 @@ const UserLogin = () => {
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm text-zinc-400 mb-1">
-                Email address
+                Email address or UserName
               </label>
               <Input
                 placeholder="you@example.com"

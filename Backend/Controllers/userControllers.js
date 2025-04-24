@@ -20,10 +20,7 @@ const userLogin = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
-    if (!checkEmail(email)) {
-      return res.status(400).json({ message: "Please enter a valid email address" });
-    }
-    const isUserExists = await User.findOne({ email });
+    const isUserExists = await User.findOne({ $or: [{ email: email }, { userName: email }] });
     if (!isUserExists) {
       return res.status(400).json({ message: "User does not exists with this Email" });
     }
@@ -57,8 +54,7 @@ const userLogin = async (req, res) => {
  */
 const userSignup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
+    const { name, userName, email, password } = req.body;
     if (!name) {
       return res.status(400).json({ message: "Name is Required" });
     }
@@ -69,6 +65,9 @@ const userSignup = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Please enter a valid email address" });
+    }
+    if (!userName) {
+      return res.status(400).json({ message: "UserName is Required" });
     }
     if (!password) {
       return res.status(400).json({ message: "Password is Required" });
@@ -81,7 +80,12 @@ const userSignup = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "User with this Email already exists" });
+    }
+
+    const isUserNameExist = await User.findOne({ userName })
+    if (isUserNameExist) {
+      return res.status(400).json({ message: "UserName already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -90,6 +94,7 @@ const userSignup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      userName
     });
 
     return res.status(201).json({ message: "User created successfully" });
@@ -217,10 +222,16 @@ const resetPassword = async (req, res) => {
 }
 
 
+/**
+ * @description Get User Id
+ * @route POST api/getMyId
+ * @access Private
+ */
+
 const getUserId = async (req, res) => {
   try {
 
-    const {id} = req.user
+    const { id } = req.user
     if (!id) {
       return res.status(400).json({ message: "User does not exists" });
     }
