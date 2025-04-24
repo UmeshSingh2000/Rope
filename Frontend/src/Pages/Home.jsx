@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPaperPlane,
@@ -7,6 +7,8 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/Rope-Logo.png";
+import {io} from "socket.io-client";
+const SocketURL = import.meta.env.VITE_SOCKET_API;
 
 const members = [
   { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
@@ -15,6 +17,12 @@ const members = [
 ];
 
 export default function Home() {
+  const socket = useMemo(()=>io(SocketURL),[]);
+
+  console.log(SocketURL);
+
+
+
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -27,6 +35,16 @@ export default function Home() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(()=>{
+    socket.on('connect',()=>{
+      console.log("Copnnected to server")
+    })
+
+    return()=>{
+      socket.disconnect();
+    }
+  },[]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
