@@ -217,6 +217,22 @@ const resetPassword = async (req, res) => {
 }
 
 
+const getUserId = async (req, res) => {
+  try {
+
+    const {id} = req.user
+    if (!id) {
+      return res.status(400).json({ message: "User does not exists" });
+    }
+    res.status(200).json({ id })
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+
+}
+
+
 
 
 
@@ -227,5 +243,6 @@ module.exports = {
   userSignup,
   forgetPassword,
   verifyOTP,
-  resetPassword
+  resetPassword,
+  getUserId
 };

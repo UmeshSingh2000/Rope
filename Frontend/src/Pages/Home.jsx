@@ -7,8 +7,10 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/Rope-Logo.png";
-import {io} from "socket.io-client";
+import { io } from "socket.io-client";
+import axios from "axios";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
+const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
 const members = [
   { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
@@ -17,48 +19,47 @@ const members = [
 ];
 
 export default function Home() {
-  const socket = useMemo(()=>io(SocketURL),[]);
-
-  console.log(SocketURL);
-
-
-
+  const socket = useMemo(() => io(SocketURL, {
+    withCredentials: true
+  }), []);
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+
+
+
+
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-
-    checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  useEffect(()=>{
-    socket.on('connect',()=>{
-      console.log("Copnnected to server")
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log("Connected to server")
+      
     })
 
-    return()=>{
+    return () => {
       socket.disconnect();
     }
   },[]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
-      
+
       <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
-        
+
         <div>
           <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
         </div>
         {/* Left Panel */}
         <div
-          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
-            selectedChat && isMobile ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"
-          }`}
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"
+            }`}
         >
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
             {/* Chats */}
@@ -66,16 +67,16 @@ export default function Home() {
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold mb-4">Chats</h2>
                 {/* <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" /> */}
-                </div>
-              
+              </div>
+
               <div className="p-4">
-              <input
-                type="text"
-                placeholder="Search chats..."
-                className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                
-              />
-            </div>
+                <input
+                  type="text"
+                  placeholder="Search chats..."
+                  className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+
+                />
+              </div>
               <div className="space-y-4">
                 {members.map((member, i) => (
                   <div
@@ -102,13 +103,13 @@ export default function Home() {
             <div className="p-4 overflow-y-auto">
               <h2 className="text-lg font-semibold mb-4">Groups</h2>
               <div className="p-4">
-              <input
-                type="text"
-                placeholder="Search groups..."
-                className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                
-              />
-            </div>
+                <input
+                  type="text"
+                  placeholder="Search groups..."
+                  className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+
+                />
+              </div>
               <div className="space-y-4">
                 {members.map((member, i) => (
                   <div key={i} className="flex items-center space-x-4">
@@ -131,9 +132,8 @@ export default function Home() {
 
         {/* Right Panel */}
         <div
-          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
-            selectedChat ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"
-          }`}
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"
+            }`}
         >
           {selectedChat && (
             <div className="flex flex-col h-full p-4 sm:p-6">

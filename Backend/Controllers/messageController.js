@@ -1,9 +1,16 @@
 const Message = require('../models/messageSchema');
 const { checkValidMongooseId } = require('../Utils/helperFunction');
 
+
+/**
+ * @description Send a message from one user to another
+ * @route POST /api/sendMessage
+ */
+
 const sendMessage = async (req, res) => {
     try {
-        const { senderId, receiverId, text, textType } = req.body;
+        const { receiverId, text, textType } = req.body;
+        const senderId = req.user.id
         if (!senderId || !receiverId || !text, !textType) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -29,6 +36,12 @@ const sendMessage = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 }
+
+/**
+ * @description Get all messages between two users
+ * @route POST /api/getAllMessages
+ */
+
 
 const getAllMessages = async (req, res) => {
     try {
