@@ -11,6 +11,7 @@ const chatSockets = (io) => {
                     { socketId: socket.id },
                     { upsert: true, new: true }
                 )
+                
             }
             catch (error) {
                 console.log(error)
