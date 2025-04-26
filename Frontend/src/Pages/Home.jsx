@@ -35,6 +35,20 @@ export default function Home() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
+  const addFriend = async (friendId) => {
+    try {
+      const response = await axios.post(
+        `${URL}/addFriend`,
+        { friendId },
+        { withCredentials: true }
+      );
+      toast.success(response.data.message);
+    } catch (error) {
+      
+      toast.error(error?.response?.data?.message || error.message || "Something went wrong" );
+    }
+  };
+
   useEffect(() => {
     const TimerId = setTimeout(() => {
       const fetchUser = async () => {
@@ -84,47 +98,67 @@ export default function Home() {
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
-      <div className="p-4 border-b border-gray-800">
-    <div className="flex justify-between items-center">
-      <h2 className="text-lg font-semibold">Chats</h2>
-      {/* Optional: Logo or profile icon can be placed here */}
-    </div>
-
-    {/* Search Input */}
-    <div className="mt-4">
-      <input
-        type="text"
-        placeholder="Search chats..."
-        className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none placeholder-gray-400"
-        onChange={(e) => setUserName(e.target.value)}
-      />
-    </div>
-  </div>
-
-  {/* Users List */}
-  <div className="p-4 overflow-y-auto space-y-4">
-    {users.map((user, i) => (
-      <div
-        key={i}
-        className="flex items-center gap-4 cursor-pointer hover:bg-gray-800 p-3 rounded-md transition"
-        onClick={() => setSelectedChat(user)}
-      >
-        <Avatar className="w-10 h-10">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>{user.name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
-        </Avatar>
-
-        <div className="flex-1 min-w-0">
-          <p className="font-medium truncate">{user.name}</p>
-          <p className="text-sm text-gray-400 truncate">{user.userName}</p>
+      <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
+        <div>
+          <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
         </div>
+        {/* Left Panel */}
+        <div
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat && isMobile
+              ? "-translate-x-full opacity-0"
+              : "translate-x-0 opacity-100"
+          }`}
+        >
+          <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
+            {/* Chats */}
+            <div className="p-4 border-b border-gray-800">
+              <div className="flex justify-between">
+                <h2 className="text-lg font-semibold mb-4">Chats</h2>
+                {/* <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" /> */}
+              </div>
 
-        <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm">
-          Add
-        </Button>
-      </div>
-    ))}
-  </div>
+              <div className="p-4">
+                <input
+                  type="text"
+                  placeholder="Search chats..."
+                  className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-4">
+                {users.map((user, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                    onClick={() => setSelectedChat(user)}
+                  >
+                    <Avatar>
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{user.name}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {user.userName}
+                      </p>
+                    </div>
+                    <span>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent selecting the chat when clicking Add
+                          addFriend(user._id);
+                        }}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm"
+                      >
+                        Add
+                      </Button>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Groups */}
             <div className="p-4 overflow-y-auto">
