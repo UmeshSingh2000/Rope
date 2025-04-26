@@ -244,11 +244,11 @@ const getUserId = async (req, res) => {
 }
 
 
-const getUserByUserId = async(req,res)=>{
+const getUserByUserName = async(req,res)=>{
   try{
     const {userName} = req.body;
-    if(!userId){
-      return res.status(400).json({message:"UserId is required"})
+    if(!userName){
+      return res.status(400).json({message:"UserName is required"})
     }
     const user = await User.findOne({userName});
     if(!user){
@@ -275,4 +275,5 @@ module.exports = {
   verifyOTP,
   resetPassword,
   getUserId,
+  getUserByUserName
 };
