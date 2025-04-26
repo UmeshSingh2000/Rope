@@ -258,9 +258,9 @@ const getUserByUserName = async (req, res) => {
     if (!userName) {
       return res.status(400).json({ message: "UserName is required" })
     }
-    const user = await User.findOne({ userName:{$regex: new RegExp(`^${userName}`, 'i')} },{password:0,createdAt:0,updatedAt:0,OTP:0,OTPExpiresIn:0});
-    if(!user){
-      return res.status(404).json({message:"User with this User Name does not exist"})
+    const user = await User.findOne({ userName: { $regex: new RegExp(`^${userName}`, 'i') } }, { password: 0, createdAt: 0, updatedAt: 0, OTP: 0, OTPExpiresIn: 0 });
+    if (!user) {
+      return res.status(404).json({ message: "User with this User Name does not exist" })
     }
     return res.status(200).json({ message: "User found", user });
   }
@@ -274,23 +274,63 @@ const addFriend = async (req, res) => {
   try {
     const { friendId } = req.body;
     const userId = req.user.id;
+
     if (!friendId) {
       return res.status(400).json({ message: "Friend ID is required" });
     }
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
-
-    if(friendId === userId) {
+    if (friendId === userId) {
       return res.status(400).json({ message: "You cannot add yourself as a friend" });
     }
 
-    
-  }
-  catch (err) {
+    // Sender's side
+    let userFriends = await UserFriendsList.findOne({ userId });
+    if (!userFriends) {
+      userFriends = new UserFriendsList({ userId, friendsList: [] });
+    }
+
+    const alreadyFriend = userFriends.friendsList.find(
+      (friend) => friend.friendId.toString() === friendId
+    );
+
+    if (alreadyFriend) {
+      return res.status(409).json({ message: "Friend request already sent or already a friend" });
+    }
+
+    userFriends.friendsList.push({
+      friendId,
+      status: 'pending'
+    });
+
+    await userFriends.save();
+
+    // Receiver's side
+    let friendFriendsList = await UserFriendsList.findOne({ userId: friendId });
+    if (!friendFriendsList) {
+      friendFriendsList = new UserFriendsList({ userId: friendId, friendsList: [] });
+    }
+
+    const alreadyExistsForReceiver = friendFriendsList.friendsList.find(
+      (friend) => friend.friendId.toString() === userId
+    );
+
+    if (!alreadyExistsForReceiver) {
+      friendFriendsList.friendsList.push({
+        friendId: userId,
+        status: 'request_received'
+      });
+      await friendFriendsList.save();
+    }
+
+    return res.status(200).json({ message: "Friend request sent successfully!" });
+  } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: "Internal server error", error: err.message });
   }
-}
+};
+
 
 
 
@@ -306,5 +346,6 @@ module.exports = {
   verifyOTP,
   resetPassword,
   getUserId,
-  getUserByUserName
+  getUserByUserName,
+  addFriend
 };
