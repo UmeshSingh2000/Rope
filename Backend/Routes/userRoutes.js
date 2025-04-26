@@ -6,7 +6,8 @@ const {
     forgetPassword,
     verifyOTP,
     resetPassword,
-    getUserId
+    getUserId,
+    testController
 } = require('../Controllers/userControllers');
 const authenticateToken = require('../Middlewares/JWT');
 const { sendMessage, getAllMessages } = require('../Controllers/messageController');
@@ -24,9 +25,10 @@ router.post('/forgetPassword', forgetPassword); // route to send mail to user fo
 router.post('/verifyOTP', verifyOTP); // route to verify OTP
 router.post('/resetPassword', resetPassword)
 
+router.get('/test',testController)
+
 
 // message related routes
-router.post('/sendMessage',authenticateToken,sendMessage)
 router.post('/getAllMessages',authenticateToken,getAllMessages)
 
 module.exports = router;

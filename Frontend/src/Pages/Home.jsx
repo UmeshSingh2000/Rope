@@ -9,6 +9,7 @@ import {
 import logo from "../assets/Rope-Logo.png";
 import { io } from "socket.io-client";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -40,13 +41,27 @@ export default function Home() {
   useEffect(() => {
     socket.on('connect', () => {
       console.log("Connected to server")
-      
+
     })
 
     return () => {
       socket.disconnect();
     }
-  },[]);
+  }, []);
+
+  const [id, setId] = useState('')
+  const sendMesage = () => {
+    socket.emit('sendMessage', {
+      to: id,
+      message: "Hello World"
+    })
+  }
+
+  useEffect(() => {
+    socket.on('receiveMessage', (data) => {
+      console.log(data)
+    })
+  }, [socket])
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
@@ -55,6 +70,7 @@ export default function Home() {
 
         <div>
           <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
+          <Button className='cursor-pointer' onClick={sendMesage}>Send Message</Button>
         </div>
         {/* Left Panel */}
         <div
@@ -74,7 +90,7 @@ export default function Home() {
                   type="text"
                   placeholder="Search chats..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-
+                  onChange={(e) => setId(e.target.value)}
                 />
               </div>
               <div className="space-y-4">
@@ -189,6 +205,7 @@ export default function Home() {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>

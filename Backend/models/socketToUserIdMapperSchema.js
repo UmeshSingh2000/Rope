@@ -7,6 +7,10 @@ const mapper = new Schema({
         required: true,
         ref: 'User'
     },
+    userName:{
+        type: String,
+        required: true,
+    },
     socketId: {
         type: String,
         required: true,

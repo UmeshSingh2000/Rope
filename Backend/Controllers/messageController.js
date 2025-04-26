@@ -3,45 +3,36 @@ const { checkValidMongooseId } = require('../Utils/helperFunction');
 
 
 /**
- * @description Send a message from one user to another
- * @route POST /api/sendMessage
+ * @description Store message in database
  */
 
-const sendMessage = async (req, res) => {
-    try {
-        const { receiverId, text, textType } = req.body;
-        const senderId = req.user.id
-        if (!senderId || !receiverId || !text, !textType) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
-        if (!checkValidMongooseId(senderId)) {
-            return res.status(400).json({ message: "Invalid senderId" });
-        }
-        if (!checkValidMongooseId(receiverId)) {
-            return res.status(400).json({ message: "Invalid receiverId" });
-        }
-
-
-        const newMessage = new Message({
-            senderId,
-            receiverId,
-            text,
-            textType
-        })
-        await newMessage.save();
-        res.status(201).json({ message: "Message Send Successfull" })
+const sendMessage = async ({ senderId, receiverId, text, textType }) => {
+    if (!senderId || !receiverId || !text || !textType) {
+        throw new Error("All fields are required");
     }
-    catch (err) {
-        return res.status(500).json({ message: "Internal server error", error: err.message });
+
+    if (!checkValidMongooseId(senderId)) {
+        throw new Error("Invalid senderId");
     }
-}
+    if (!checkValidMongooseId(receiverId)) {
+        throw new Error("Invalid receiverId");
+    }
+
+    const newMessage = new Message({
+        senderId,
+        receiverId,
+        text,
+        textType
+    });
+
+    await newMessage.save();
+    return newMessage;
+};
 
 /**
  * @description Get all messages between two users
  * @route POST /api/getAllMessages
  */
-
 
 const getAllMessages = async (req, res) => {
     try {

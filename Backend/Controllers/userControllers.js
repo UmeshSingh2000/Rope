@@ -22,7 +22,7 @@ const userLogin = async (req, res) => {
     }
     const isUserExists = await User.findOne({ $or: [{ email: email }, { userName: email }] });
     if (!isUserExists) {
-      return res.status(400).json({ message: "User does not exists with this Email" });
+      return res.status(400).json({ message: "User does not" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, isUserExists.password);
@@ -244,6 +244,25 @@ const getUserId = async (req, res) => {
 }
 
 
+const getUserByUserId = async(req,res)=>{
+  try{
+    const {userName} = req.body;
+    if(!userId){
+      return res.status(400).json({message:"UserId is required"})
+    }
+    const user = await User.findOne({userName});
+    if(!user){
+      return res.status(404).json({message:"User with this User Name does not exist"})
+    }
+    return res.status(200).json({message:"User found",user});
+  }
+  catch(err){
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+}
+
+
+
 
 
 
@@ -255,5 +274,5 @@ module.exports = {
   forgetPassword,
   verifyOTP,
   resetPassword,
-  getUserId
+  getUserId,
 };
