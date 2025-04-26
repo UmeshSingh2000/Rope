@@ -9,6 +9,8 @@ const fs = require('fs')
 const path = require('path')
 const { generateOTP } = require('../Utils/helperFunction.js');
 
+const UserFriendsList = require('../models/userFriendsList.js')
+
 /**
  * @description User login controller
  * @route POST api/userLogin
@@ -250,19 +252,42 @@ const getUserId = async (req, res) => {
  * @access Private
  */
 
-const getUserByUserName = async(req,res)=>{
-  try{
-    const {userName} = req.body;
-    if(!userName){
-      return res.status(400).json({message:"UserName is required"})
+const getUserByUserName = async (req, res) => {
+  try {
+    const { userName } = req.body;
+    if (!userName) {
+      return res.status(400).json({ message: "UserName is required" })
     }
-    const user = await User.findOne({userName});
-    if(!user){
-      return res.status(404).json({message:"User with this User Name does not exist"})
+    const user = await User.findOne({ userName:{$regex: new RegExp(`^${userName}`, 'i')} });
+    if (!user) {
+      return res.status(404).json({ message: "User with this User Name does not exist" })
     }
-    return res.status(200).json({message:"User found",user});
+    return res.status(200).json({ message: "User found", user });
   }
-  catch(err){
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+}
+
+
+const addFriend = async (req, res) => {
+  try {
+    const { friendId } = req.body;
+    const userId = req.user.id;
+    if (!friendId) {
+      return res.status(400).json({ message: "Friend ID is required" });
+    }
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    if(friendId === userId) {
+      return res.status(400).json({ message: "You cannot add yourself as a friend" });
+    }
+
+    
+  }
+  catch (err) {
     return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 }
