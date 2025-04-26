@@ -10,8 +10,11 @@ import logo from "../assets/Rope-Logo.png";
 import { io } from "socket.io-client";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
+
+
 
 const members = [
   { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
@@ -19,7 +22,11 @@ const members = [
   { name: "Isabella Nguyen", email: "i@example.com", role: "Member" },
 ];
 
+
 export default function Home() {
+
+  const[userName,setUserName]=useState();
+
   const socket = useMemo(() => io(SocketURL, {
     withCredentials: true
   }), []);
@@ -27,7 +34,29 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
 
 
-
+  useEffect(() => {
+    const TimerId = setTimeout(() => {
+      const fetchUser = async () => {
+        try {
+          const response = await axios.post(
+            `${URL}/getUserByUsername`,
+            { userName },  // use searchInput
+            { withCredentials: true }
+          );
+          console.log(response);
+          toast.success(response.data.message)
+        } catch (error) {
+          toast.error(error?.response?.data?.message || error.message || "Something went wrong");
+        }
+      };
+  
+      if (userName.trim()) {
+        fetchUser();
+      }
+    }, 500); // 500ms debounce
+  
+    return () => clearTimeout(TimerId);  // cleanup timer on each keystroke
+  }, [userName]);
 
 
   useEffect(() => {
@@ -49,19 +78,6 @@ export default function Home() {
     }
   }, []);
 
-  const [id, setId] = useState('')
-  const sendMesage = () => {
-    socket.emit('sendMessage', {
-      to: id,
-      message: "Hello World"
-    })
-  }
-
-  useEffect(() => {
-    socket.on('receiveMessage', (data) => {
-      console.log(data)
-    })
-  }, [socket])
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
@@ -70,7 +86,7 @@ export default function Home() {
 
         <div>
           <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
-          <Button className='cursor-pointer' onClick={sendMesage}>Send Message</Button>
+          
         </div>
         {/* Left Panel */}
         <div
@@ -90,7 +106,7 @@ export default function Home() {
                   type="text"
                   placeholder="Search chats..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                  onChange={(e) => setId(e.target.value)}
+                  onChange={(e)=>setUserName(e.target.value)}
                 />
               </div>
               <div className="space-y-4">
