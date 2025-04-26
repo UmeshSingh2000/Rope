@@ -11,6 +11,7 @@ const { generateOTP } = require('../Utils/helperFunction.js');
 
 const UserFriendsList = require('../models/userFriendsList.js')
 const { getIo } = require('../Sockets/chatSockets.js');
+const Mapper = require('../models/socketToUserIdMapperSchema.js')
 
 /**
  * @description User login controller
@@ -325,7 +326,11 @@ const addFriend = async (req, res) => {
       });
       await friendFriendsList.save();
     }
-    io.to(friendId).emit('friendRequestReceived', {
+    const friendSocketId = await Mapper.findOne({ userId: friendId });
+    if (!friendSocketId) {
+      return res.status(404).json({ message: "Friend not found" });
+    }
+    io.to(friendSocketId.socketId).emit('friendRequestReceived', {
       from: userId,
       message: 'You have a new friend request!'
     });

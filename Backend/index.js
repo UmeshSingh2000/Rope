@@ -6,7 +6,7 @@ const app = express();
 const { createServer } = require('http'); // importing http module
 const { Server } = require('socket.io'); // importing socket.io
 
-const chatSockets = require('./Sockets/chatSockets')
+const {chatSockets} = require('./Sockets/chatSockets')
 
 
 const userRoutes = require('./Routes/userRoutes')
