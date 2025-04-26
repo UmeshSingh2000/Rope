@@ -11,10 +11,9 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
-
-
 
 const members = [
   { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
@@ -22,17 +21,19 @@ const members = [
   { name: "Isabella Nguyen", email: "i@example.com", role: "Member" },
 ];
 
-
 export default function Home() {
+  const [users, setUsers] = useState([]);
+  const [userName, setUserName] = useState();
 
-  const[userName,setUserName]=useState();
-
-  const socket = useMemo(() => io(SocketURL, {
-    withCredentials: true
-  }), []);
+  const socket = useMemo(
+    () =>
+      io(SocketURL, {
+        withCredentials: true,
+      }),
+    []
+  );
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-
 
   useEffect(() => {
     const TimerId = setTimeout(() => {
@@ -40,24 +41,28 @@ export default function Home() {
         try {
           const response = await axios.post(
             `${URL}/getUserByUsername`,
-            { userName },  // use searchInput
+            { userName }, // use searchInput
             { withCredentials: true }
           );
-          console.log(response);
-          toast.success(response.data.message)
+
+          toast.success(response.data.message);
+          setUsers([response.data.user]);
         } catch (error) {
-          toast.error(error?.response?.data?.message || error.message || "Something went wrong");
+          toast.error(
+            error?.response?.data?.message ||
+              error.message ||
+              "Something went wrong"
+          );
         }
       };
-  
-      if (userName.trim()) {
+
+      if (userName) {
         fetchUser();
       }
     }, 500); // 500ms debounce
-  
-    return () => clearTimeout(TimerId);  // cleanup timer on each keystroke
-  }, [userName]);
 
+    return () => clearTimeout(TimerId); // cleanup timer on each keystroke
+  }, [userName]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -68,68 +73,58 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log("Connected to server")
-
-    })
+    socket.on("connect", () => {
+      console.log("Connected to server");
+    });
 
     return () => {
       socket.disconnect();
-    }
+    };
   }, []);
-
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
+      <div className="p-4 border-b border-gray-800">
+    <div className="flex justify-between items-center">
+      <h2 className="text-lg font-semibold">Chats</h2>
+      {/* Optional: Logo or profile icon can be placed here */}
+    </div>
 
-      <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
+    {/* Search Input */}
+    <div className="mt-4">
+      <input
+        type="text"
+        placeholder="Search chats..."
+        className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none placeholder-gray-400"
+        onChange={(e) => setUserName(e.target.value)}
+      />
+    </div>
+  </div>
 
-        <div>
-          <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
-          
+  {/* Users List */}
+  <div className="p-4 overflow-y-auto space-y-4">
+    {users.map((user, i) => (
+      <div
+        key={i}
+        className="flex items-center gap-4 cursor-pointer hover:bg-gray-800 p-3 rounded-md transition"
+        onClick={() => setSelectedChat(user)}
+      >
+        <Avatar className="w-10 h-10">
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>{user.name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+        </Avatar>
+
+        <div className="flex-1 min-w-0">
+          <p className="font-medium truncate">{user.name}</p>
+          <p className="text-sm text-gray-400 truncate">{user.userName}</p>
         </div>
-        {/* Left Panel */}
-        <div
-          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"
-            }`}
-        >
-          <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
-            {/* Chats */}
-            <div className="p-4 border-b border-gray-800">
-              <div className="flex justify-between">
-                <h2 className="text-lg font-semibold mb-4">Chats</h2>
-                {/* <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" /> */}
-              </div>
 
-              <div className="p-4">
-                <input
-                  type="text"
-                  placeholder="Search chats..."
-                  className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                  onChange={(e)=>setUserName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-4">
-                {members.map((member, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                    onClick={() => setSelectedChat(member)}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-600" />
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{member.name}</p>
-                      <p className="text-sm text-gray-400 truncate">
-                        {member.email}
-                      </p>
-                    </div>
-                    <span className="ml-auto text-xs text-gray-500">
-                      {member.role}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm">
+          Add
+        </Button>
+      </div>
+    ))}
+  </div>
 
             {/* Groups */}
             <div className="p-4 overflow-y-auto">
@@ -139,7 +134,6 @@ export default function Home() {
                   type="text"
                   placeholder="Search groups..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-
                 />
               </div>
               <div className="space-y-4">
@@ -164,8 +158,11 @@ export default function Home() {
 
         {/* Right Panel */}
         <div
-          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"
-            }`}
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0 md:opacity-100"
+          }`}
         >
           {selectedChat && (
             <div className="flex flex-col h-full p-4 sm:p-6">
@@ -221,7 +218,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
