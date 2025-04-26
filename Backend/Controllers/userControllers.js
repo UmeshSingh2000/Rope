@@ -244,6 +244,12 @@ const getUserId = async (req, res) => {
 }
 
 
+/**
+ * @description Get User by User Name
+ * @route POST api/getUserByUserName
+ * @access Private
+ */
+
 const getUserByUserName = async(req,res)=>{
   try{
     const {userName} = req.body;
