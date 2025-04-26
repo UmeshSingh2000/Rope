@@ -256,7 +256,7 @@ const getUserByUserName = async(req,res)=>{
     if(!userName){
       return res.status(400).json({message:"UserName is required"})
     }
-    const user = await User.findOne({userName});
+    const user = await User.findOne({userName},{password:0,createdAt:0,updatedAt:0,OTP:0,OTPExpiresIn:0});
     if(!user){
       return res.status(404).json({message:"User with this User Name does not exist"})
     }
