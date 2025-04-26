@@ -1,8 +1,10 @@
 const socketMapper = require('../models/socketToUserIdMapperSchema')
-const socketMiddleware = require('../middlewares/SocketMiddleWare');
+const socketMiddleware = require('../Middlewares/SocketMiddleWare')
 const { socketPrivateMessageSender } = require('../Controllers/socketMessageSender');
 const User = require('../models/userSchema')
+let ioInstance;
 const chatSockets = (io) => {
+    ioInstance = io;
     io.use(socketMiddleware) // if need the userId in socket user socket.user.id else in normal use req.user.id
     io.on('connection', async (socket) => {
         console.log('A user connected', socket.id)
@@ -14,7 +16,7 @@ const chatSockets = (io) => {
             }
             await socketMapper.findOneAndUpdate(
                 { userId: socket.user.id },
-                { userName: user.userName,socketId: socket.id },
+                { userName: user.userName, socketId: socket.id },
                 { upsert: true, new: true }
             )
             socketPrivateMessageSender(socket)
@@ -34,5 +36,12 @@ const chatSockets = (io) => {
         })
     });
 }
+const getIo = () => {
+    if (!ioInstance) {
+        throw new Error("Socket.io not initialized");
+    }
+    return ioInstance;
+};
 
 module.exports = chatSockets;
+module.exports = { getIo }
