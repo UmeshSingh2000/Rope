@@ -10,6 +10,7 @@ const path = require('path')
 const { generateOTP } = require('../Utils/helperFunction.js');
 
 const UserFriendsList = require('../models/userFriendsList.js')
+const { getIo } = require('../Sockets/chatSockets.js');
 
 /**
  * @description User login controller
@@ -272,6 +273,7 @@ const getUserByUserName = async (req, res) => {
 
 const addFriend = async (req, res) => {
   try {
+    const io = getIo();
     const { friendId } = req.body;
     const userId = req.user.id;
 
@@ -323,7 +325,10 @@ const addFriend = async (req, res) => {
       });
       await friendFriendsList.save();
     }
-
+    io.to(friendId).emit('friendRequestReceived', {
+      from: userId,
+      message: 'You have a new friend request!'
+    });
     return res.status(200).json({ message: "Friend request sent successfully!" });
   } catch (err) {
     console.error(err);
