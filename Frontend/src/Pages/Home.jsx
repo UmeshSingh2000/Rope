@@ -12,6 +12,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CustomToast } from "@/components/CustomToast";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -95,6 +96,12 @@ export default function Home() {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(()=>{
+    socket.on('friendRequestReceived', (data) => {
+      CustomToast();
+    })
+  },[socket])
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">

@@ -43,5 +43,4 @@ const getIo = () => {
     return ioInstance;
 };
 
-module.exports = chatSockets;
-module.exports = { getIo }
+module.exports = { getIo,chatSockets }
