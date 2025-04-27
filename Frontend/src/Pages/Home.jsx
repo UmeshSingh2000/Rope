@@ -115,9 +115,16 @@ export default function Home() {
             { userName }, // use searchInput
             { withCredentials: true }
           );
-          toast.success(response.data.message);
-          setUsers([response.data.user]);
+
+          if (response.data.user) {
+            setUsers([response.data.user]);
+          } else {
+            setUsers([]);
+          }
+          // toast.success(response.data.message);
+          // setUsers([response.data.user]);
         } catch (error) {
+          setUsers([]);
           toast.error(
             error?.response?.data?.message ||
               error.message ||
