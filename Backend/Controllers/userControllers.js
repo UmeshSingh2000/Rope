@@ -349,7 +349,7 @@ const addFriend = async (req, res) => {
 
 /**
  * @description Get My Friends
- * @route POST api/getMyFriends
+ * @route GET api/getMyFriends
  * @access Private
  */
 
@@ -366,6 +366,7 @@ const getMyFriends = async(req,res)=>{
     }
     const friendsList = userFriends.friendsList.filter((friend)=>friend.status==='accepted').map((friend)=>friend.friendId)
     res.status(200).json({message:"Friends List",friendsList})
+    
   }
   catch(err){
     return res.status(500).json({ message: "Internal server error", error: err.message });

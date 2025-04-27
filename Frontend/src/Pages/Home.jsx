@@ -25,6 +25,7 @@ const members = [
 export default function Home() {
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState();
+  const [friends, setFriends] = useState([]);
 
   const socket = useMemo(
     () =>
@@ -45,18 +46,35 @@ export default function Home() {
       );
       toast.success(response.data.message);
     } catch (error) {
-      
-      toast.error(error?.response?.data?.message || error.message || "Something went wrong" );
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
   };
 
-  const getFriends=async()=>{
+  const getFriends = async () => {
     try {
-      const response=await axois.get()
+      const response = await axios.get(`${URL}/getMyFriends`, {
+        withCredentials: true,
+      });
+      setFriends(response.data.friendsList || []);
+      console.log(friends);
+      toast.success(response.data.message);
+      // getFriends();
     } catch (error) {
-      toast.error(error?.message?.data?.message||error.message||"Something went wrong");
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
-  }
+  };
+
+  useEffect(() => {
+    getFriends();
+  }, []);
 
   useEffect(() => {
     const TimerId = setTimeout(() => {
@@ -105,11 +123,11 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(()=>{
-    socket.on('friendRequestReceived', (data) => {
+  useEffect(() => {
+    socket.on("friendRequestReceived", (data) => {
       CustomToast();
-    })
-  },[socket])
+    });
+  }, [socket]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
@@ -129,7 +147,7 @@ export default function Home() {
             {/* Chats */}
             <div className="p-4 border-b border-gray-800 relative">
               <div className="flex justify-between">
-                <h2 className="text-lg font-semibold mb-4">Chats</h2>
+                <h2 className="text-lg font-semibold mb-4">Search</h2>
                 {/* <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" /> */}
               </div>
 
@@ -138,79 +156,75 @@ export default function Home() {
                   type="text"
                   placeholder="Search chats..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                  value={userName}
+                 
                   onChange={(e) => setUserName(e.target.value)}
                 />
-                 {userName && users.length > 0 && (
-      <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
-        {users.map((user, i) => (
-          <div
-            key={i}
-            className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-            onClick={() => {
-              setSelectedChat(user);
-              setUserName('');
-              setUsers([]);
-            }}
-          >
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-
-            <div className="min-w-0">
-              <p className="font-medium truncate">{user.name}</p>
-              <p className="text-sm text-gray-400 truncate">{user.userName}</p>
-            </div>
-            <span>
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addFriend(user._id);
-                }}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
-              >
-                Add
-              </Button>
-            </span>
-          </div>
-        ))}
-      </div>
-    )}
-                
-              </div>
-              {/* <div className="space-y-4">
-                {users.map((user, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                    onClick={() => setSelectedChat(user)}
-                  >
-                    <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{user.name}</p>
-                      <p className="text-sm text-gray-400 truncate">
-                        {user.userName}
-                      </p>
-                    </div>
-                    <span>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation(); // prevent selecting the chat when clicking Add
-                          addFriend(user._id);
+                {userName && users.length > 0 && (
+                  <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {users.map((user, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                        onClick={() => {
+                          setSelectedChat(user);
+                          setUserName("");
+                          setUsers([]);
                         }}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm"
                       >
-                        Add
-                      </Button>
-                    </span>
+                        <Avatar>
+                          <AvatarImage src="https://github.com/shadcn.png" />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{user.name}</p>
+                          <p className="text-sm text-gray-400 truncate">
+                            {user.userName}
+                          </p>
+                        </div>
+                        <span>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addFriend(user._id);
+                            }}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
+                          >
+                            Add
+                          </Button>
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div> */}
+                )}
+              </div>
+            </div>
+           
+
+            {/* Friends List */}
+            <div className="p-4 overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-4">Chats</h2>
+            <div className="space-y-4">
+              {friends.map((friend, i) => (
+                <div
+                  key={i}
+                  className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                  onClick={() => setSelectedChat(friend)}
+                >
+                  <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{friend.name}</p>
+                    <p className="text-sm text-gray-400 truncate">
+                      {friend.userName}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
             </div>
 
             {/* Groups */}
