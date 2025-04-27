@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CustomToast } from "@/components/CustomToast";
+import Loader from "@/components/Loader/Loader";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -200,7 +201,7 @@ export default function Home() {
                   <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
                     {loading ? (
                       <div className="flex justify-center items-center p-4">
-                        <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <Loader />
                       </div>
                     ) : users.length > 0 ? (
                       users.map((user, i) => (
