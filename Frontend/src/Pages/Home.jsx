@@ -27,6 +27,7 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const [friends, setFriends] = useState([]);
   const [allFriends, setAllFriends] = useState([]); // copy of friends
+  const [loading, setloading] = useState(false);
 
   const socket = useMemo(
     () =>
@@ -49,8 +50,8 @@ export default function Home() {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-        error.message ||
-        "Something went wrong"
+          error.message ||
+          "Something went wrong"
       );
     }
   };
@@ -68,8 +69,8 @@ export default function Home() {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-        error.message ||
-        "Something went wrong"
+          error.message ||
+          "Something went wrong"
       );
     }
   };
@@ -88,7 +89,7 @@ export default function Home() {
       return (
         user.userName.toLowerCase().includes(userName.toLowerCase()),
         user.name.toLowerCase().includes(userName.toLowerCase())
-      )
+      );
     });
 
     if (filteredUsers.length > 0) {
@@ -107,6 +108,7 @@ export default function Home() {
     const TimerId = setTimeout(() => {
       const fetchUser = async () => {
         setUsers([]);
+        setloading(true);
         try {
           const response = await axios.post(
             `${URL}/getUserByUsername`,
@@ -118,9 +120,11 @@ export default function Home() {
         } catch (error) {
           toast.error(
             error?.response?.data?.message ||
-            error.message ||
-            "Something went wrong"
+              error.message ||
+              "Something went wrong"
           );
+        } finally {
+          setloading(false);
         }
       };
 
@@ -164,13 +168,14 @@ export default function Home() {
         </div>
         {/* Left Panel */}
         <div
-          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile
-            ? "-translate-x-full opacity-0"
-            : "translate-x-0 opacity-100"
-            }`}
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat && isMobile
+              ? "-translate-x-full opacity-0"
+              : "translate-x-0 opacity-100"
+          }`}
         >
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
-            {/* Chats */}
+            {/* Search */}
             <div className="p-4 border-b border-gray-800 relative">
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold mb-4">Search</h2>
@@ -182,50 +187,58 @@ export default function Home() {
                   type="text"
                   placeholder="Search chats..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-
                   onChange={(e) => setUserName(e.target.value)}
                 />
-                {userName && users.length > 0 && (
+                {userName && (
                   <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {users.map((user, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                        onClick={() => {
-                          setSelectedChat(user);
-                          setUserName("");
-                          setUsers([]);
-                        }}
-                      >
-                        <Avatar>
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-
-                        <div className="min-w-0">
-                          <p className="font-medium truncate">{user.name}</p>
-                          <p className="text-sm text-gray-400 truncate">
-                            {user.userName}
-                          </p>
-                        </div>
-                        <span>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              addFriend(user._id);
-                            }}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
-                          >
-                            Add
-                          </Button>
-                        </span>
+                    {loading ? (
+                      <div className="flex justify-center items-center p-4">
+                        <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                       </div>
-                    ))}
+                    ) : users.length > 0 ? (
+                      users.map((user, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                          onClick={() => {
+                            setSelectedChat(user);
+                            setUserName("");
+                            setUsers([]);
+                          }}
+                        >
+                          <Avatar>
+                            <AvatarImage src="https://github.com/shadcn.png" />
+                            <AvatarFallback>CN</AvatarFallback>
+                          </Avatar>
+
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{user.name}</p>
+                            <p className="text-sm text-gray-400 truncate">
+                              {user.userName}
+                            </p>
+                          </div>
+                          <span>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addFriend(user._id);
+                              }}
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
+                            >
+                              Add
+                            </Button>
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-400">
+                        No user found
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
-
 
             {/* Friends List */}
             <div className="p-4 overflow-y-auto">
@@ -285,10 +298,11 @@ export default function Home() {
 
         {/* Right Panel */}
         <div
-          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat
-            ? "translate-x-0 opacity-100"
-            : "translate-x-full opacity-0 md:opacity-100"
-            }`}
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0 md:opacity-100"
+          }`}
         >
           {selectedChat && (
             <div className="flex flex-col h-full p-4 sm:p-6">
