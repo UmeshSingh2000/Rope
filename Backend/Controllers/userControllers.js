@@ -272,6 +272,12 @@ const getUserByUserName = async (req, res) => {
 }
 
 
+/**
+ * @description Add Friend
+ * @route POST api/addFriend
+ * @access Private
+ */
+
 const addFriend = async (req, res) => {
   try {
     const io = getIo();
@@ -341,6 +347,31 @@ const addFriend = async (req, res) => {
   }
 };
 
+/**
+ * @description Get My Friends
+ * @route POST api/getMyFriends
+ * @access Private
+ */
+
+
+const getMyFriends = async(req,res)=>{
+  const { id } = req.user
+  if (!id) {
+    return res.status(400).json({ message: "User does not exists" });
+  }
+  try{
+    const userFriends = await  UserFriendsList.findOne({userId:id}).populate('friendsList.friendId', 'name email userName')
+    if(!userFriends){
+      return res.status(404).json({message:"No Friends Found"})
+    }
+    const friendsList = userFriends.friendsList.filter((friend)=>friend.status==='accepted').map((friend)=>friend.friendId)
+    res.status(200).json({message:"Friends List",friendsList})
+  }
+  catch(err){
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+}
+
 
 
 
@@ -357,5 +388,6 @@ module.exports = {
   resetPassword,
   getUserId,
   getUserByUserName,
-  addFriend
+  addFriend,
+  getMyFriends
 };
