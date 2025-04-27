@@ -50,6 +50,14 @@ export default function Home() {
     }
   };
 
+  const getFriends=async()=>{
+    try {
+      const response=await axois.get()
+    } catch (error) {
+      toast.error(error?.message?.data?.message||error.message||"Something went wrong");
+    }
+  }
+
   useEffect(() => {
     const TimerId = setTimeout(() => {
       const fetchUser = async () => {
@@ -119,21 +127,59 @@ export default function Home() {
         >
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
             {/* Chats */}
-            <div className="p-4 border-b border-gray-800">
+            <div className="p-4 border-b border-gray-800 relative">
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold mb-4">Chats</h2>
                 {/* <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" /> */}
               </div>
 
-              <div className="p-4">
+              <div className="p-4 relative">
                 <input
                   type="text"
                   placeholder="Search chats..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+                  value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                 />
+                 {userName && users.length > 0 && (
+      <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+        {users.map((user, i) => (
+          <div
+            key={i}
+            className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+            onClick={() => {
+              setSelectedChat(user);
+              setUserName('');
+              setUsers([]);
+            }}
+          >
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <p className="font-medium truncate">{user.name}</p>
+              <p className="text-sm text-gray-400 truncate">{user.userName}</p>
+            </div>
+            <span>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addFriend(user._id);
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
+              >
+                Add
+              </Button>
+            </span>
+          </div>
+        ))}
+      </div>
+    )}
+                
               </div>
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 {users.map((user, i) => (
                   <div
                     key={i}
@@ -164,7 +210,7 @@ export default function Home() {
                     </span>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             {/* Groups */}
