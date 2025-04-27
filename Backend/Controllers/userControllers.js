@@ -256,6 +256,7 @@ const getUserId = async (req, res) => {
 
 const getUserByUserName = async (req, res) => {
   try {
+    const {id} = req.user
     const { userName } = req.body;
     if (!userName) {
       return res.status(400).json({ message: "UserName is required" })
@@ -263,6 +264,9 @@ const getUserByUserName = async (req, res) => {
     const user = await User.findOne({ userName: { $regex: new RegExp(`^${userName}`, 'i') } }, { password: 0, createdAt: 0, updatedAt: 0, OTP: 0, OTPExpiresIn: 0 });
     if (!user) {
       return res.status(404).json({ message: "User with this User Name does not exist" })
+    }
+    if(user._id.toString()===id.toString()){
+      return res.status(400).json({ message: "You cannot search yourself" })
     }
     return res.status(200).json({ message: "User found", user });
   }
