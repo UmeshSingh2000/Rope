@@ -85,8 +85,10 @@ export default function Home() {
     }
 
     const filteredUsers = allFriends.filter((user) => {
-      user.userName.toLowerCase().includes(userName.toLowerCase()),
+      return (
+        user.userName.toLowerCase().includes(userName.toLowerCase()),
         user.name.toLowerCase().includes(userName.toLowerCase())
+      )
     });
 
     if (filteredUsers.length > 0) {
