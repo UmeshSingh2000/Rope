@@ -24,8 +24,9 @@ const members = [
 
 export default function Home() {
   const [users, setUsers] = useState([]);
-  const [userName, setUserName] = useState();
+  const [userName, setUserName] = useState("");
   const [friends, setFriends] = useState([]);
+  const [allFriends, setAllFriends] = useState([]); // copy of friends
 
   const socket = useMemo(
     () =>
@@ -48,8 +49,8 @@ export default function Home() {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error.message ||
-          "Something went wrong"
+        error.message ||
+        "Something went wrong"
       );
     }
   };
@@ -60,14 +61,15 @@ export default function Home() {
         withCredentials: true,
       });
       setFriends(response.data.friendsList || []);
-      console.log(friends);
+      setAllFriends(response.data.friendsList || []);
+      // console.log(friends);
       toast.success(response.data.message);
       // getFriends();
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error.message ||
-          "Something went wrong"
+        error.message ||
+        "Something went wrong"
       );
     }
   };
@@ -76,23 +78,46 @@ export default function Home() {
     getFriends();
   }, []);
 
+  const localSearch = () => {
+    if (userName.trim() === "") {
+      setFriends(allFriends);
+      return false;
+    }
+
+    const filteredUsers = allFriends.filter((user) => {
+      user.userName.toLowerCase().includes(userName.toLowerCase()),
+        user.name.toLowerCase().includes(userName.toLowerCase())
+    });
+
+    if (filteredUsers.length > 0) {
+      setFriends(filteredUsers);
+      return true;
+    } else {
+      setFriends(allFriends);
+      return false;
+    }
+  };
+
   useEffect(() => {
+    if (localSearch()) {
+      return;
+    }
     const TimerId = setTimeout(() => {
       const fetchUser = async () => {
+        setUsers([]);
         try {
           const response = await axios.post(
             `${URL}/getUserByUsername`,
             { userName }, // use searchInput
             { withCredentials: true }
           );
-
           toast.success(response.data.message);
           setUsers([response.data.user]);
         } catch (error) {
           toast.error(
             error?.response?.data?.message ||
-              error.message ||
-              "Something went wrong"
+            error.message ||
+            "Something went wrong"
           );
         }
       };
@@ -137,11 +162,10 @@ export default function Home() {
         </div>
         {/* Left Panel */}
         <div
-          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
-            selectedChat && isMobile
-              ? "-translate-x-full opacity-0"
-              : "translate-x-0 opacity-100"
-          }`}
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile
+            ? "-translate-x-full opacity-0"
+            : "translate-x-0 opacity-100"
+            }`}
         >
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
             {/* Chats */}
@@ -156,7 +180,7 @@ export default function Home() {
                   type="text"
                   placeholder="Search chats..."
                   className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                 
+
                   onChange={(e) => setUserName(e.target.value)}
                 />
                 {userName && users.length > 0 && (
@@ -199,32 +223,32 @@ export default function Home() {
                 )}
               </div>
             </div>
-           
+
 
             {/* Friends List */}
             <div className="p-4 overflow-y-auto">
               <h2 className="text-lg font-semibold mb-4">Chats</h2>
-            <div className="space-y-4">
-              {friends.map((friend, i) => (
-                <div
-                  key={i}
-                  className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                  onClick={() => setSelectedChat(friend)}
-                >
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
+              <div className="space-y-4">
+                {friends.map((friend, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                    onClick={() => setSelectedChat(friend)}
+                  >
+                    <Avatar>
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
 
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{friend.name}</p>
-                    <p className="text-sm text-gray-400 truncate">
-                      {friend.userName}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{friend.name}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {friend.userName}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </div>
 
             {/* Groups */}
@@ -259,11 +283,10 @@ export default function Home() {
 
         {/* Right Panel */}
         <div
-          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
-            selectedChat
-              ? "translate-x-0 opacity-100"
-              : "translate-x-full opacity-0 md:opacity-100"
-          }`}
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-0 md:opacity-100"
+            }`}
         >
           {selectedChat && (
             <div className="flex flex-col h-full p-4 sm:p-6">
