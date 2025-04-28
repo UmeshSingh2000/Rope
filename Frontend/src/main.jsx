@@ -15,20 +15,27 @@ library.add(fas);
 
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import { AuthProvider } from "./Auth/AuthProvider";
+import { store } from "./Redux/store";
+import { Provider } from "react-redux";
 
 createRoot(document.getElementById("root")).render(
-  <AuthProvider>
-    <BrowserRouter>
-      <Toaster position="top-right" reverseOrder={false} />
-      <Routes>
-        <Route path="/" element={<UserLogin />} />
-        <Route path="/userSignup" element={<UserSignup />} />
-        <Route path="/home" element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-      </Routes>
-    </BrowserRouter>
-  </AuthProvider>
+  <Provider store={store}>
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster position="top-right" reverseOrder={false} />
+        <Routes>
+          <Route path="/" element={<UserLogin />} />
+          <Route path="/userSignup" element={<UserSignup />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  </Provider>
 );

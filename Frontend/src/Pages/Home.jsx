@@ -14,6 +14,8 @@ import toast from "react-hot-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CustomToast } from "@/components/CustomToast";
 import Loader from "@/components/Loader/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { setFriends } from "@/Redux/Features/User/friendsSlice";
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
@@ -24,9 +26,12 @@ const members = [
 ];
 
 export default function Home() {
+  const dispatch=useDispatch();
+  const friends=useSelector((state)=>state.friends.value);
+
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState("");
-  const [friends, setFriends] = useState([]);
+  // const [friends, setFriends] = useState([]);
   const [allFriends, setAllFriends] = useState([]); // copy of friends
   const [loading, setloading] = useState(false);
 
@@ -62,7 +67,8 @@ export default function Home() {
       const response = await axios.get(`${URL}/getMyFriends`, {
         withCredentials: true,
       });
-      setFriends(response.data.friendsList || []);
+      dispatch(setFriends(response.data.friendsList || []))
+      // setFriends(response.data.friendsList || []);
       setAllFriends(response.data.friendsList || []);
       // console.log(friends);
       toast.success(response.data.message);
@@ -76,6 +82,10 @@ export default function Home() {
     }
   };
 
+  useEffect(()=>{
+    console.log(friends);
+  })
+
   useEffect(() => {
     getFriends();
   }, []);
@@ -88,7 +98,7 @@ export default function Home() {
 
     const filteredUsers = allFriends.filter((user) => {
       return (
-        user.userName.toLowerCase().includes(userName.toLowerCase()),
+        user.userName.toLowerCase().includes(userName.toLowerCase())||
         user.name.toLowerCase().includes(userName.toLowerCase())
       );
     });
