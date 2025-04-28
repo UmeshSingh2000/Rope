@@ -9,7 +9,7 @@ export const friendsSlice = createSlice({
   initialState,
   reducers: {
    setFriends:(state,action)=>{
-    state.value=[...state.value,action.payload]
+    state.value=action.payload
    }
   },
 })
