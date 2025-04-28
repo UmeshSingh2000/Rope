@@ -67,10 +67,9 @@ export default function Home() {
       const response = await axios.get(`${URL}/getMyFriends`, {
         withCredentials: true,
       });
-      dispatch(setFriends(response.data.friendsList || []))
-      // setFriends(response.data.friendsList || []);
+      // console.log(response.data.friendsList);
+      dispatch(setFriends(response.data.friendsList[0]))
       setAllFriends(response.data.friendsList || []);
-      // console.log(friends);
       toast.success(response.data.message);
       // getFriends();
     } catch (error) {
@@ -82,9 +81,6 @@ export default function Home() {
     }
   };
 
-  useEffect(()=>{
-    console.log(friends);
-  })
 
   useEffect(() => {
     getFriends();
