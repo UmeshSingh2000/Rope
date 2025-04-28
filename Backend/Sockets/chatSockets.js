@@ -1,6 +1,6 @@
 const socketMapper = require('../models/socketToUserIdMapperSchema')
 const socketMiddleware = require('../Middlewares/SocketMiddleWare')
-const { socketPrivateMessageSender } = require('../Controllers/socketMessageSender');
+const { socketPrivateMessageSender, requestHandler } = require('../Controllers/socketMessageSender');
 const User = require('../models/userSchema')
 let ioInstance;
 const chatSockets = (io) => {
@@ -20,6 +20,7 @@ const chatSockets = (io) => {
                 { upsert: true, new: true }
             )
             socketPrivateMessageSender(socket)
+            requestHandler(socket)
         }
         catch (error) {
             console.log(error)

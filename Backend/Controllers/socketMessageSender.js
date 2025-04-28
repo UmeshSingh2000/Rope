@@ -1,5 +1,6 @@
 const Mapper = require('../models/socketToUserIdMapperSchema')
 const { sendMessage } = require('./messageController')
+const UserFriendsList = require('../models/userFriendsList')
 const socketPrivateMessageSender = (socket) => {
     socket.on('sendMessage', async ({ to, message }) => {
         try {
@@ -36,7 +37,34 @@ const socketPrivateMessageSender = (socket) => {
     });
 };
 
+const requestHandler = (socket) => {
+    socket.on('requests', async ({ requestStatus, userId, friendId }) => {
+        try {
+            if (requestStatus !== 'accepted' || requestStatus !== 'rejected') {
+                return socket.emit('notification', { message: 'Invalid request status' });
+            }
+            else {
+                const result = await UserFriendsList.updateOne({ userId, 'friendsList.friendId': friendId }, {
+                    $set: {
+                        'friendsList.$.status': requestStatus
+                    }
+                })
+                if (result.modifiedCount === 0) {
+                    socket.emit('notification', { message: 'Friend not found' });
+                } else {
+                    socket.emit('notification', { message: `Request ${requestStatus}` });
+                }
+            }
+        }
+        catch (error) {
+            console.error(error.message);
+            socket.emit('messageError', { message: error.message });
+        }
+    })
+}
+
 
 module.exports = {
-    socketPrivateMessageSender
+    socketPrivateMessageSender,
+    requestHandler
 }

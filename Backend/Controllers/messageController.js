@@ -36,7 +36,8 @@ const sendMessage = async ({ senderId, receiverId, text, textType }) => {
 
 const getAllMessages = async (req, res) => {
     try {
-        const { senderId, receiverId } = req.body;
+        const senderId = req.user.id;
+        const { receiverId } = req.body;
         if (!senderId || !receiverId) {
             return res.status(400).json({ message: "All fields are required" });
         }

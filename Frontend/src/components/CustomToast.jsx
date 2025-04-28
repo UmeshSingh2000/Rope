@@ -1,7 +1,7 @@
 import React from 'react'
 import { toast } from 'react-hot-toast';
 
-export const CustomToast = () => {
+export const CustomToast = (socket) => {
     return (
         toast.custom((t) => (
             <div
@@ -29,7 +29,10 @@ export const CustomToast = () => {
                 </div>
                 <div className="flex border-l border-gray-200">
                     <button
-                        onClick={() => toast.dismiss(t.id)}
+                        onClick={() => {
+                            toast.dismiss(t.id)
+                            socket.emit('requests',({requestStatus:'accepted',userId:'64f3b0c4d1e2a5f8b8c9e4a7',friendId:'64f3b0c4d1e2a5f8b8c9e4a7'}))
+                        }}
                         className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                         Accept
