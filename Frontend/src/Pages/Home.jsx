@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faPhone, faVideo, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPaperPlane,
+  faPhone,
+  faVideo,
+  faArrowLeft,
+  faCheckDouble,
+  faCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/Rope-Logo.png";
 import { io } from "socket.io-client";
 import axios from "axios";
@@ -11,6 +18,7 @@ import { CustomToast } from "@/components/CustomToast";
 import Loader from "@/components/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "@/Redux/Features/User/friendsSlice";
+import { setMessages } from "@/Redux/Features/Messages/messagesSlice";
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
@@ -24,6 +32,7 @@ const members = [
 export default function Home() {
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friends.value);
+  // const messages = useSelector((state) => state.messages.value);
 
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState("");
@@ -31,29 +40,87 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState("");
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
 
+  const getId = async () => {
+    try {
+      const response = await axios.get(`${URL}/getMyId`, {
+        withCredentials: true,
+      });
+      setCurrentUserId(response.data.id);
+      // console.log(response.data.id);
+      toast.success("Got Id");
+    } catch (error) {
+      toast.error(error?.response?.data.message || "Something went wrong");
+    }
+  };
+
+  useEffect(() => {
+    getId();
+  }, []);
+
   const addFriend = async (friendId) => {
     try {
-      const response = await axios.post(`${URL}/addFriend`, { friendId }, { withCredentials: true });
+      const response = await axios.post(
+        `${URL}/addFriend`,
+        { friendId },
+        { withCredentials: true }
+      );
       toast.success(response.data.message);
       getFriends();
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message || "Something went wrong");
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
   };
 
   const getFriends = async () => {
     try {
-      const response = await axios.get(`${URL}/getMyFriends`, { withCredentials: true });
+      const response = await axios.get(`${URL}/getMyFriends`, {
+        withCredentials: true,
+      });
       dispatch(setFriends(response.data.friendsList));
       setFilteredFriend(response.data.friendsList || []);
       toast.success(response.data.message);
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message || "Something went wrong");
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
   };
+
+  const getMessages = async (receiverId) => {
+    try {
+      const response = await axios.post(
+        `${URL}/getAllMessages`,
+        { receiverId },
+        { withCredentials: true }
+      );
+      // dispatch(setMessages(response.data));
+      setMessages(response.data);
+      // console.log(response.data.map((message) => message));
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went Wrong"
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (selectedChat) {
+      getMessages(selectedChat._id);
+    }
+  }, [selectedChat]);
 
   useEffect(() => {
     getFriends();
@@ -65,9 +132,10 @@ export default function Home() {
       return false;
     }
 
-    const filtered = friends.filter((user) =>
-      user.userName.toLowerCase().includes(userName.toLowerCase()) ||
-      user.name.toLowerCase().includes(userName.toLowerCase())
+    const filtered = friends.filter(
+      (user) =>
+        user.userName.toLowerCase().includes(userName.toLowerCase()) ||
+        user.name.toLowerCase().includes(userName.toLowerCase())
     );
     setFilteredFriend(filtered);
     return filtered.length > 0;
@@ -91,7 +159,11 @@ export default function Home() {
           setUsers(response.data.user ? [response.data.user] : []);
         } catch (error) {
           setUsers([]);
-          toast.error(error?.response?.data?.message || error.message || "Something went wrong");
+          toast.error(
+            error?.response?.data?.message ||
+              error.message ||
+              "Something went wrong"
+          );
         } finally {
           setLoading(false);
         }
@@ -111,10 +183,10 @@ export default function Home() {
 
   useEffect(() => {
     socket.on("connect", () => console.log("Connected to server"));
-    socket.on("friendRequestReceived", ({from,message}) => {
+    socket.on("friendRequestReceived", ({ from, message }) => {
       console.log("Friend request received from", from, message);
-      CustomToast()
-    })
+      CustomToast();
+    });
     socket.on("notification", (data) => {
       if (data.message) {
         toast.success(data.message);
@@ -126,22 +198,26 @@ export default function Home() {
       socket.off("connect");
       socket.off("friendRequestReceived");
       socket.off("notification");
-    }
+    };
   }, [socket]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
       <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
-
         {/* Logo */}
         <div>
           <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
         </div>
 
         {/* Left Panel */}
-        <div className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"}`}>
+        <div
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat && isMobile
+              ? "-translate-x-full opacity-0"
+              : "translate-x-0 opacity-100"
+          }`}
+        >
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
-
             {/* Search Bar */}
             <div className="p-4 border-b border-gray-800 relative">
               <div className="flex justify-between">
@@ -163,38 +239,44 @@ export default function Home() {
                       <div className="flex justify-center items-center p-4">
                         <Loader />
                       </div>
-                    ) : users.length > 0 && (
-                      <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {users.map((user, i) => (
-                          <div
-                            key={`search-${i}`}
-                            className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                            onClick={() => {
-                              setSelectedChat(user);
-                              setUserName("");
-                              setUsers([]);
-                            }}
-                          >
-                            <Avatar>
-                              <AvatarImage src="https://github.com/shadcn.png" />
-                              <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                              <p className="font-medium truncate">{user.name}</p>
-                              <p className="text-sm text-gray-400 truncate">{user.userName}</p>
-                            </div>
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                addFriend(user._id);
+                    ) : (
+                      users.length > 0 && (
+                        <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                          {users.map((user, i) => (
+                            <div
+                              key={`search-${i}`}
+                              className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                              onClick={() => {
+                                setSelectedChat(user);
+                                setUserName("");
+                                setUsers([]);
                               }}
-                              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
                             >
-                              Add
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                              <Avatar>
+                                <AvatarImage src="https://github.com/shadcn.png" />
+                                <AvatarFallback>CN</AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">
+                                  {user.name}
+                                </p>
+                                <p className="text-sm text-gray-400 truncate">
+                                  {user.userName}
+                                </p>
+                              </div>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addFriend(user._id);
+                                }}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
+                              >
+                                Add
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )
                     )}
                   </div>
                 )}
@@ -219,7 +301,9 @@ export default function Home() {
                     </Avatar>
                     <div className="min-w-0">
                       <p className="font-medium truncate">{friend.name}</p>
-                      <p className="text-sm text-gray-400 truncate">{friend.userName}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {friend.userName}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -242,7 +326,9 @@ export default function Home() {
                     <div className="w-10 h-10 rounded-full bg-gray-600" />
                     <div className="min-w-0">
                       <p className="font-medium truncate">{member.name}</p>
-                      <p className="text-sm text-gray-400 truncate">{member.email}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {member.email}
+                      </p>
                     </div>
                     <span className="ml-auto text-xs text-gray-500">
                       {member.role}
@@ -251,25 +337,35 @@ export default function Home() {
                 ))}
               </div>
             </div>
-
           </div>
         </div>
 
         {/* Right Panel (Chat Window) */}
-        <div className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"}`}>
+        <div
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
+            selectedChat
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0 md:opacity-100"
+          }`}
+        >
           {selectedChat && (
             <div className="flex flex-col h-full p-4 sm:p-6">
               {/* Header */}
               <div className="flex items-center pb-4 border-b border-gray-800">
                 {isMobile && (
-                  <button className="mr-4 text-gray-400" onClick={() => setSelectedChat(null)}>
+                  <button
+                    className="mr-4 text-gray-400"
+                    onClick={() => setSelectedChat(null)}
+                  >
                     <FontAwesomeIcon icon={faArrowLeft} />
                   </button>
                 )}
                 <div className="w-10 h-10 rounded-full bg-gray-600" />
                 <div className="ml-3 overflow-hidden">
                   <p className="font-semibold truncate">{selectedChat.name}</p>
-                  <p className="text-sm text-gray-400 truncate">{selectedChat.email}</p>
+                  <p className="text-sm text-gray-400 truncate">
+                    {selectedChat.email}
+                  </p>
                 </div>
                 <div className="ml-auto flex gap-4 text-gray-400 text-lg">
                   <FontAwesomeIcon icon={faPhone} />
@@ -278,20 +374,41 @@ export default function Home() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-1">
-                <div className="bg-[#2a2a2a] p-3 rounded-xl max-w-xs w-fit">
-                  Hi, how can I help you today?
-                </div>
-                <div className="bg-blue-600 p-3 rounded-xl self-end text-white max-w-xs w-fit">
-                  Hey, I'm having trouble with my account.
-                </div>
-                <div className="bg-[#2a2a2a] p-3 rounded-xl max-w-xs w-fit">
-                  What seems to be the problem?
-                </div>
-                <div className="bg-blue-600 p-3 rounded-xl self-end text-white max-w-xs w-fit">
-                  I can't log in.
-                </div>
-              </div>
+              <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-2 flex flex-col">
+  {messages.map((message) => {
+    const isOwnMessage = message.senderId._id === currentUserId;
+    const bubbleStyles = isOwnMessage
+      ? "bg-blue-500 text-white"
+      : "bg-gray-300 text-black";
+
+    return (
+      <div key={message._id} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}>
+        <div className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}>
+          {/* Text */}
+          <div className="text-base">{message.text}</div>
+
+          {/* Seen / Delivered indicator (only for own messages) */}
+          {isOwnMessage && (
+            <div className="flex items-center justify-end gap-1 text-xs text-gray-200 mt-2">
+              {message.isRead ? (
+                <>
+                  <FontAwesomeIcon icon={faCheckDouble} size="sm" className="text-blue-300" />
+                  {/* <span>Seen</span> */}
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faCheck} size="sm" className="text-gray-300" />
+                  {/* <span>Delivered</span> */}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  })}
+</div>
+
 
               {/* Input */}
               <div className="mt-4 flex items-center">
@@ -307,7 +424,6 @@ export default function Home() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
