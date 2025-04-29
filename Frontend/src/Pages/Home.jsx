@@ -394,32 +394,23 @@ export default function Home() {
                       <div
                         className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
                       >
-                        {/* Text */}
-                        <div className="text-base">{message.text}</div>
-                        {/* Seen / Delivered indicator (only for own messages) */}
-                        {isOwnMessage && (
-                          <div className="flex items-center justify-end gap-1 text-xs text-gray-200 mt-2">
-                            {message.isRead ? (
-                              <>
-                                <FontAwesomeIcon
-                                  icon={faCheckDouble}
-                                  size="sm"
-                                  className="text-blue-300"
-                                />
-                                {/* <span>Seen</span> */}
-                              </>
+                        <div className="flex items-end gap-5">
+                          <span className="text-base">{message.text}</span>
+                          {isOwnMessage &&
+                            (message.isRead ? (
+                              <FontAwesomeIcon
+                                icon={faCheckDouble}
+                                size="sm"
+                                className="text-blue-300"
+                              />
                             ) : (
-                              <>
-                                <FontAwesomeIcon
-                                  icon={faCheck}
-                                  size="sm"
-                                  className="text-gray-300"
-                                />
-                                {/* <span>Delivered</span> */}
-                              </>
-                            )}
-                          </div>
-                        )}
+                              <FontAwesomeIcon
+                                icon={faCheck}
+                                size="sm"
+                                className="text-gray-300"
+                              />
+                            ))}
+                        </div>
                       </div>
                     </div>
                   );
