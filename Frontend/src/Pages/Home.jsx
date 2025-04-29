@@ -112,8 +112,8 @@ export default function Home() {
   useEffect(() => {
     socket.on("connect", () => console.log("Connected to server"));
     socket.on("friendRequestReceived", ({from,message}) => {
-      console.log("Friend request received from", from, message);
-      CustomToast()
+      // console.log("Friend request received from", from, message);
+      CustomToast(socket,from,message)
     })
     socket.on("notification", (data) => {
       if (data.message) {
