@@ -78,10 +78,11 @@ export default function Home() {
       setUsers([]);
       return;
     }
-
+    setFilteredFriend(friends)
     const timerId = setTimeout(() => {
       const fetchUser = async () => {
         setLoading(true);
+
         try {
           const response = await axios.post(
             `${URL}/getUserByUsername`,
@@ -111,9 +112,9 @@ export default function Home() {
 
   useEffect(() => {
     socket.on("connect", () => console.log("Connected to server"));
-    socket.on("friendRequestReceived", ({from,message}) => {
+    socket.on("friendRequestReceived", ({ from, message }) => {
       // console.log("Friend request received from", from, message);
-      CustomToast(socket,from,message)
+      CustomToast(socket, from, message)
     })
     socket.on("notification", (data) => {
       if (data.message) {
