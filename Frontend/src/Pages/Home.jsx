@@ -123,7 +123,9 @@ export default function Home() {
   }, [selectedChat]);
 
   useEffect(() => {
+    // if(friends.length < 0) {
     getFriends();
+    // }
   }, []);
 
   const localSearch = () => {
