@@ -32,7 +32,7 @@ const members = [
 export default function Home() {
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friends.value);
-  // const messages = useSelector((state) => state.messages.value);
+  const messages = useSelector((state) => state.messages.value);
 
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState("");
@@ -40,7 +40,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
   const [currentUserId, setCurrentUserId] = useState("");
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
@@ -104,8 +104,8 @@ export default function Home() {
         { receiverId },
         { withCredentials: true }
       );
-      // dispatch(setMessages(response.data));
-      setMessages(response.data);
+      dispatch(setMessages(response.data));
+      // setMessages(response.data);
       // console.log(response.data.map((message) => message));
     } catch (error) {
       toast.error(
@@ -250,6 +250,7 @@ export default function Home() {
                                 setSelectedChat(user);
                                 setUserName("");
                                 setUsers([]);
+                                
                               }}
                             >
                               <Avatar>
@@ -386,7 +387,6 @@ export default function Home() {
         <div className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}>
           {/* Text */}
           <div className="text-base">{message.text}</div>
-
           {/* Seen / Delivered indicator (only for own messages) */}
           {isOwnMessage && (
             <div className="flex items-center justify-end gap-1 text-xs text-gray-200 mt-2">
