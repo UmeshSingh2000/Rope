@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer')
 const mongoose = require('mongoose')
+const User = require('../models/userSchema')
 
 const generateToken = ({ id, name }) => {
   try {
@@ -66,11 +67,32 @@ const checkValidMongooseId = (id) => {
 
 
 
+const getUser = async (id) => {
+  if (!id) throw new Error('Id is required');
+
+  const user = await User.findById(id, {
+    password: 0,
+    createdAt: 0,
+    updatedAt: 0,
+    OTP: 0,
+    OTPExpiresIn: 0
+  });
+
+  if (!user) throw new Error('User not found');
+
+  return user;
+};
+
+
+
+
+
 
 module.exports = {
   checkEmail,
   generateToken,
   sendMail,
   generateOTP,
-  checkValidMongooseId
+  checkValidMongooseId,
+  getUser
 };
