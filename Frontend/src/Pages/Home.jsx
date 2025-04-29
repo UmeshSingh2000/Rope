@@ -148,7 +148,7 @@ export default function Home() {
       setUsers([]);
       return;
     }
-    setFilteredFriend(friends)
+    setFilteredFriend(friends);
     const timerId = setTimeout(() => {
       const fetchUser = async () => {
         setLoading(true);
@@ -188,7 +188,7 @@ export default function Home() {
     socket.on("connect", () => console.log("Connected to server"));
     socket.on("friendRequestReceived", ({ from, message }) => {
       // console.log("Friend request received from", from, message);
-      CustomToast(socket,from,message);
+      CustomToast(socket, from, message);
     });
     socket.on("notification", (data) => {
       if (data.message) {
@@ -253,7 +253,6 @@ export default function Home() {
                                 setSelectedChat(user);
                                 setUserName("");
                                 setUsers([]);
-                                
                               }}
                             >
                               <Avatar>
@@ -379,39 +378,53 @@ export default function Home() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-2 flex flex-col">
-  {messages.map((message) => {
-    const isOwnMessage = message.senderId._id === currentUserId;
-    const bubbleStyles = isOwnMessage
-      ? "bg-blue-500 text-white"
-      : "bg-gray-300 text-black";
+                {messages.map((message) => {
+                  const isOwnMessage = message.senderId._id === currentUserId;
+                  const bubbleStyles = isOwnMessage
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 text-black";
 
-    return (
-      <div key={message._id} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}>
-        <div className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}>
-          {/* Text */}
-          <div className="text-base">{message.text}</div>
-          {/* Seen / Delivered indicator (only for own messages) */}
-          {isOwnMessage && (
-            <div className="flex items-center justify-end gap-1 text-xs text-gray-200 mt-2">
-              {message.isRead ? (
-                <>
-                  <FontAwesomeIcon icon={faCheckDouble} size="sm" className="text-blue-300" />
-                  {/* <span>Seen</span> */}
-                </>
-              ) : (
-                <>
-                  <FontAwesomeIcon icon={faCheck} size="sm" className="text-gray-300" />
-                  {/* <span>Delivered</span> */}
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  })}
-</div>
-
+                  return (
+                    <div
+                      key={message._id}
+                      className={`flex ${
+                        isOwnMessage ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                      >
+                        {/* Text */}
+                        <div className="text-base">{message.text}</div>
+                        {/* Seen / Delivered indicator (only for own messages) */}
+                        {isOwnMessage && (
+                          <div className="flex items-center justify-end gap-1 text-xs text-gray-200 mt-2">
+                            {message.isRead ? (
+                              <>
+                                <FontAwesomeIcon
+                                  icon={faCheckDouble}
+                                  size="sm"
+                                  className="text-blue-300"
+                                />
+                                {/* <span>Seen</span> */}
+                              </>
+                            ) : (
+                              <>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  size="sm"
+                                  className="text-gray-300"
+                                />
+                                {/* <span>Delivered</span> */}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
               {/* Input */}
               <div className="mt-4 flex items-center">
