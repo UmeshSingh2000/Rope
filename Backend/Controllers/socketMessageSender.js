@@ -38,9 +38,11 @@ const socketPrivateMessageSender = (socket) => {
 };
 
 const requestHandler = (socket) => {
-    socket.on('requests', async ({ requestStatus, userId, friendId }) => {
+    socket.on('requests', async ({ requestStatus, friendId }) => {
+        console.log(friendId)
+        const userId = socket.user.id;
         try {
-            if (requestStatus !== 'accepted' || requestStatus !== 'rejected') {
+            if (requestStatus !== 'accepted' && requestStatus !== 'rejected') {
                 return socket.emit('notification', { message: 'Invalid request status' });
             }
             else {
@@ -50,9 +52,9 @@ const requestHandler = (socket) => {
                     }
                 })
                 if (result.modifiedCount === 0) {
-                    socket.emit('notification', { message: 'Friend not found' });
+                    socket.to(friendId).emit('notification', { message: 'Friend not found' });
                 } else {
-                    socket.emit('notification', { message: `Request ${requestStatus}` });
+                    socket.to(friendId).emit('notification', { message: `Request ${requestStatus}` });
                 }
             }
         }
