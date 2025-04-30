@@ -7,6 +7,8 @@ import {
   faArrowLeft,
   faCheckDouble,
   faCheck,
+  faGear,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/Rope-Logo.png";
 import { io } from "socket.io-client";
@@ -77,16 +79,15 @@ export default function Home() {
     }
   };
 
-  const sendMessage=()=>{
-    console.log("Sending message to: ", selectedChat.userName);
+  const sendMessage = () => {
+    console.log("Sending message to: ", selectedChat._id);
     console.log("Message content: ", "Hi");
     socket.emit("sendMessage", {
-
       // senderId: currentUserId,
-      to: selectedChat.userName,
-      message:"Hi",
+      to: selectedChat._id,
+      message: "Hi",
     });
-  }
+  };
 
   const getFriends = async () => {
     try {
@@ -189,12 +190,12 @@ export default function Home() {
 
   useEffect(() => {
     socket.on("connect", () => console.log("Connected to server"));
-    socket.on("friendRequestReceived", ({ from, message,senderInfo }) => {
-      CustomToast(socket,from,message,senderInfo,getFriends);
+    socket.on("friendRequestReceived", ({ from, message, senderInfo }) => {
+      CustomToast(socket, from, message, senderInfo, getFriends);
     });
     socket.on("notification", (data) => {
       if (data.message) {
-        if(data.message = "Request accepted"){
+        if ((data.message = "Request accepted")) {
           getFriends();
         }
         toast.success(data.message);
@@ -212,9 +213,32 @@ export default function Home() {
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
       <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-xl bg-[#1a1a1a] text-white shadow-lg">
-        {/* Logo */}
-        <div>
-          <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
+        <div className="hidden md:flex flex-col w-20 h-full bg-[#0d0d0d] border-r border-gray-800">
+
+          <div className="flex justify-center items-center h-20 border-b border-gray-800">
+            <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
+          </div>
+
+          <div className="flex flex-col items-center space-y-6 text-gray-400 text-lg mt-6">
+            <button className="hover:text-white" title="Chats">
+              <FontAwesomeIcon icon={faPaperPlane} />
+            </button>
+            <button className="hover:text-white" title="Groups">
+              <FontAwesomeIcon icon={faVideo} />
+            </button>
+            <button className="hover:text-white" title="Calls">
+              <FontAwesomeIcon icon={faPhone} />
+            </button>
+          </div>
+
+          <div className="mt-auto mb-6 flex flex-col items-center space-y-6 text-gray-400 text-lg">
+            <button className="hover:text-white" title="Settings">
+              <FontAwesomeIcon icon={faGear} />
+            </button>
+            <button className="hover:text-white" title="Logout">
+              <FontAwesomeIcon icon={faRightFromBracket} />
+            </button>
+          </div>
         </div>
 
         {/* Left Panel */}
@@ -429,7 +453,10 @@ export default function Home() {
                   placeholder="Type your message..."
                   className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
                 />
-                <button onClick={sendMessage} className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-full text-white">
+                <button
+                  onClick={sendMessage}
+                  className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-full text-white"
+                >
                   <FontAwesomeIcon icon={faPaperPlane} />
                 </button>
               </div>

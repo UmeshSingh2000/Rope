@@ -6,6 +6,12 @@ const socketPrivateMessageSender = (socket) => {
         
         try {
             const receiver = await Mapper.findOne({ userId: to });
+            const savedMessage = await sendMessage({
+                senderId: socket.user.id,
+                receiverId: receiver.userId, // make sure userId exists in your Mapper schema
+                text: message,
+                textType: 'text'
+            });
             if (!receiver) {
                 return socket.emit('userNotFound', { message: 'User not found' });
             }
@@ -17,12 +23,6 @@ const socketPrivateMessageSender = (socket) => {
             }
 
             // Save message in DB
-            const savedMessage = await sendMessage({
-                senderId: socket.user.id,
-                receiverId: receiver.userId, // make sure userId exists in your Mapper schema
-                text: message,
-                textType: 'text'
-            });
 
             // Emit message to receiver
             socket.to(receiverSocketId).emit('receiveMessage', {
