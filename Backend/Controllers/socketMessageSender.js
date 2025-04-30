@@ -3,11 +3,13 @@ const { sendMessage } = require('./messageController')
 const UserFriendsList = require('../models/userFriendsList')
 const socketPrivateMessageSender = (socket) => {
     socket.on('sendMessage', async ({ to, message }) => {
+        
         try {
-            const receiver = await Mapper.findOne({ userName: to });
+            const receiver = await Mapper.findOne({ userId: to });
             if (!receiver) {
                 return socket.emit('userNotFound', { message: 'User not found' });
             }
+            console.log('Receiver found:', receiver);
 
             const receiverSocketId = receiver.socketId;
             if (!receiverSocketId) {

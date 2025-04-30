@@ -17,7 +17,7 @@ const chatSockets = (io) => {
             await socketMapper.findOneAndUpdate(
                 { userId: socket.user.id },
                 { userName: user.userName, socketId: socket.id },
-                { upsert: true, new: true }
+                // { upsert: true, new: true }
             )
             socketPrivateMessageSender(socket)
             requestHandler(socket)
