@@ -10,8 +10,7 @@ const socketPrivateMessageSender = (socket) => {
             if (!receiver) {
                 return socket.emit('userNotFound', { message: 'User not found' });
             }
-            console.log('Receiver found:', receiver);
-
+ 
             const receiverSocketId = receiver.socketId;
             if (!receiverSocketId) {
                 return socket.emit('userNotFound', { message: 'User not found' });

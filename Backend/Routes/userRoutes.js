@@ -15,216 +15,80 @@ const {
 const authenticateToken = require('../Middlewares/JWT');
 const { sendMessage, getAllMessages } = require('../Controllers/messageController');
 
-
 /**
- * @swagger
- * /api/getMyId:
- *   get:
- *     summary: Get the authenticated user's ID
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Return Mongo Id of the authenticated user
+ * @description Get the authenticated user's ID
+ * @route GET api/getMyId
+ * @access Private
  */
 router.get('/getMyId', authenticateToken, getUserId)
 
 /**
- * @swagger
- * /api/userLogin:
- *   post:
- *     summary: Log in a user
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login User to the System
+ * @description User login controller
+ * @route POST api/userLogin
+ * @access Public
  */
 router.post('/userLogin', userLogin)
 
 /**
- * @swagger
- * /api/userSignup:
- *   post:
- *     summary: Register a new user
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       201:
- *         description: User created successfully
+ * @description User registration (signup) controller
+ * @route POST api/userSignup
+ * @access Public
  */
 router.post('/userSignup', userSignup)
 
 /**
- * @swagger
- * /api/forgetPassword:
- *   post:
- *     summary: Request password reset via email
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *     responses:
- *       200:
- *         description: Password reset email sent
+ * @description Request a password reset email
+ * @route POST api/forgetPassword
+ * @access Public
  */
 router.post('/forgetPassword', forgetPassword)
 
 /**
- * @swagger
- * /api/verifyOTP:
- *   post:
- *     summary: Verify OTP
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               otp:
- *                 type: string
- *     responses:
- *       200:
- *         description: OTP verified successfully
+ * @description Verify OTP for password reset
+ * @route POST api/verifyOTP
+ * @access Public
  */
 router.post('/verifyOTP', verifyOTP)
 
 /**
- * @swagger
- * /api/resetPassword:
- *   post:
- *     summary: Reset user password
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               newPassword:
- *                 type: string
- *     responses:
- *       200:
- *         description: Password reset successfully
+ * @description Reset user password after OTP verification
+ * @route POST api/resetPassword
+ * @access Public
  */
 router.post('/resetPassword', resetPassword)
 
 /**
- * @swagger
- * /api/addFriend:
- *   post:
- *     summary: Add a friend
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               friendId:
- *                 type: string
- *     responses:
- *       200:
- *         description: Friend added successfully
+ * @description Add a friend to the authenticated user's friend list
+ * @route POST api/addFriend
+ * @access Private
  */
 router.post('/addFriend', authenticateToken, addFriend)
 
 /**
- * @swagger
- * /api/getMyFriends:
- *   get:
- *     summary: Get list of my friends
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Friends list retrieved successfully
+ * @description Get the list of friends for the authenticated user
+ * @route GET api/getMyFriends
+ * @access Private
  */
 router.get('/getMyFriends', authenticateToken, getMyFriends)
 
 /**
- * @swagger
- * /api/logout:
- *   get:
- *     summary: Log out the user
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: User logged out successfully
+ * @description User logout controller
+ * @route GET api/logout
+ * @access Private
  */
 router.get('/logout', authenticateToken, userLogout)
 
 /**
- * @swagger
- * /api/getAllMessages:
- *   post:
- *     summary: Get all messages between two users
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               to:
- *                 type: string
- *     responses:
- *       200:
- *         description: Messages retrieved successfully
+ * @description Get all messages between the authenticated user and another user
+ * @route POST api/getAllMessages
+ * @access Private
  */
 router.post('/getAllMessages', authenticateToken, getAllMessages)
 
 /**
- * @swagger
- * /api/getUserByUserName:
- *   get:
- *     summary: Get user details by username
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: username
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: User data retrieved successfully
+ * @description Get user details by username
+ * @route GET api/getUserByUserName
+ * @access Private
  */
 router.get('/getUserByUserName', authenticateToken, getUserByUserName)
 

@@ -8,7 +8,6 @@ const { Server } = require('socket.io'); // importing socket.io
 
 const {chatSockets} = require('./Sockets/chatSockets')
 
-const { swaggerUi, swaggerSpec } = require('./swagger'); // import Swagger
 
 const userRoutes = require('./Routes/userRoutes')
 const makeDbConnection = require('./Configuration/dbConnections');
@@ -50,8 +49,6 @@ app.use(cors({
 app.use('/api', userRoutes);
 app.use('/api', verifyTokenRoute)
 
-// Swagger API documentation route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 

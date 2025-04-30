@@ -43,6 +43,7 @@ export default function Home() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [currentUserId, setCurrentUserId] = useState("");
+  const [message, setMessage] = useState("");
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
 
@@ -73,19 +74,17 @@ export default function Home() {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error.message ||
-          "Something went wrong"
+        error.message ||
+        "Something went wrong"
       );
     }
   };
 
   const sendMessage = () => {
-    console.log("Sending message to: ", selectedChat._id);
-    console.log("Message content: ", "Hi");
     socket.emit("sendMessage", {
       // senderId: currentUserId,
       to: selectedChat._id,
-      message: "Hi",
+      message: message,
     });
   };
 
@@ -99,8 +98,8 @@ export default function Home() {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error.message ||
-          "Something went wrong"
+        error.message ||
+        "Something went wrong"
       );
     }
   };
@@ -116,8 +115,8 @@ export default function Home() {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error.message ||
-          "Something went Wrong"
+        error.message ||
+        "Something went Wrong"
       );
     }
   };
@@ -147,6 +146,18 @@ export default function Home() {
     return filtered.length > 0;
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get(`${URL}/logout`, { withCredentials: true });
+      toast.success(response.data.message);
+
+      window.location.reload()
+    }
+    catch (error) {
+      toast.error(error?.response?.data?.message || error.message || "Something went wrong")
+    }
+  }
+
   useEffect(() => {
     if (localSearch()) {
       setUsers([]);
@@ -168,8 +179,8 @@ export default function Home() {
           setUsers([]);
           toast.error(
             error?.response?.data?.message ||
-              error.message ||
-              "Something went wrong"
+            error.message ||
+            "Something went wrong"
           );
         } finally {
           setLoading(false);
@@ -203,10 +214,15 @@ export default function Home() {
         toast.error("Something went wrong");
       }
     });
+
+    socket.on('receiveMessage', ({ message, from, textType }) => {
+      console.log("Received message: ", message, "from: ", from, "textType: ", textType);
+    })
     return () => {
       socket.off("connect");
       socket.off("friendRequestReceived");
       socket.off("notification");
+      socket.off("receiveMessage");
     };
   }, [socket]);
 
@@ -216,9 +232,7 @@ export default function Home() {
         <div className="hidden md:flex flex-col w-20 h-full bg-[#0d0d0d] border-r border-gray-800">
 
           <div className="flex justify-center items-center h-20 border-b border-gray-800">
-            <img src={logo} onClick={()=>{
-              window.open('http://localhost:3000/api-docs/','_blank')
-            }} alt="Logo" className="w-20 h-20 rounded-full cursor-pointer" />
+            <img src={logo} alt="Logo" className="w-20 h-20 rounded-full cursor-pointer" />
           </div>
 
           <div className="flex flex-col items-center space-y-6 text-gray-400 text-lg mt-6">
@@ -237,7 +251,7 @@ export default function Home() {
             <button className="hover:text-white" title="Settings">
               <FontAwesomeIcon icon={faGear} />
             </button>
-            <button className="hover:text-white" title="Logout">
+            <button onClick={handleLogout} className="hover:text-white cursor-pointer" title="Logout">
               <FontAwesomeIcon icon={faRightFromBracket} />
             </button>
           </div>
@@ -245,11 +259,10 @@ export default function Home() {
 
         {/* Left Panel */}
         <div
-          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${
-            selectedChat && isMobile
-              ? "-translate-x-full opacity-0"
-              : "translate-x-0 opacity-100"
-          }`}
+          className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile
+            ? "-translate-x-full opacity-0"
+            : "translate-x-0 opacity-100"
+            }`}
         >
           <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
             {/* Search Bar */}
@@ -376,11 +389,10 @@ export default function Home() {
 
         {/* Right Panel (Chat Window) */}
         <div
-          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${
-            selectedChat
-              ? "translate-x-0 opacity-100"
-              : "translate-x-full opacity-0 md:opacity-100"
-          }`}
+          className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-0 md:opacity-100"
+            }`}
         >
           {selectedChat && (
             <div className="flex flex-col h-full p-4 sm:p-6">
@@ -418,9 +430,8 @@ export default function Home() {
                   return (
                     <div
                       key={message._id}
-                      className={`flex ${
-                        isOwnMessage ? "justify-end" : "justify-start"
-                      }`}
+                      className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
+                        }`}
                     >
                       <div
                         className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
@@ -454,6 +465,8 @@ export default function Home() {
                   type="text"
                   placeholder="Type your message..."
                   className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
+                  onChange={(e) => setMessage(e.target.value)}
+                  value={message}
                 />
                 <button
                   onClick={sendMessage}

@@ -26,9 +26,8 @@ const chatSockets = (io) => {
             console.log(error)
         }
 
-        socket.on('disconnect', async () => {
+        socket.on('disconnect', () => {
             try {
-                await socketMapper.findOneAndDelete({ socketId: socket.id })
                 console.log('User disconnected', socket.id)
             }
             catch (error) {

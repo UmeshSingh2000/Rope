@@ -381,7 +381,7 @@ const getMyFriends = async (req, res) => {
 }
 
 
-const userLogout = async(req,res)=>{
+const userLogout = (req,res)=>{
   try {
     res.clearCookie('token', {
       httpOnly: true,
