@@ -1,7 +1,8 @@
 const {
   checkEmail,
   generateToken,
-  sendMail
+  sendMail,
+  getUser
 } = require('../Utils/helperFunction.js')
 const bcrypt = require('bcrypt');
 const User = require('../models/userSchema.js')
@@ -244,7 +245,6 @@ const getUserId = async (req, res) => {
   catch (err) {
     return res.status(500).json({ message: "Internal server error", error: err.message });
   }
-
 }
 
 
@@ -256,7 +256,7 @@ const getUserId = async (req, res) => {
 
 const getUserByUserName = async (req, res) => {
   try {
-    const {id} = req.user
+    const { id } = req.user
     const { userName } = req.body;
     if (!userName) {
       return res.status(400).json({ message: "UserName is required" })
@@ -265,7 +265,7 @@ const getUserByUserName = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User with this User Name does not exist" })
     }
-    if(user._id.toString()===id.toString()){
+    if (user._id.toString() === id.toString()) {
       return res.status(400).json({ message: "You cannot search yourself" })
     }
     return res.status(200).json({ message: "User found", user });
@@ -328,6 +328,7 @@ const addFriend = async (req, res) => {
     const alreadyExistsForReceiver = friendFriendsList.friendsList.find(
       (friend) => friend.friendId.toString() === userId
     );
+    
 
     if (!alreadyExistsForReceiver) {
       friendFriendsList.friendsList.push({
@@ -340,8 +341,10 @@ const addFriend = async (req, res) => {
     if (!friendSocketId) {
       return res.status(404).json({ message: "Friend not found" });
     }
+    const senderInfo = await getUser(userId)
     io.to(friendSocketId.socketId).emit('friendRequestReceived', {
       from: userId,
+      senderInfo,
       message: 'You have a new friend request!'
     });
     return res.status(200).json({ message: "Friend request sent successfully!" });
@@ -358,24 +361,26 @@ const addFriend = async (req, res) => {
  */
 
 
-const getMyFriends = async(req,res)=>{
+const getMyFriends = async (req, res) => {
   const { id } = req.user
   if (!id) {
     return res.status(400).json({ message: "User does not exists" });
   }
-  try{
-    const userFriends = await  UserFriendsList.findOne({userId:id}).populate('friendsList.friendId', 'name email userName')
-    if(!userFriends){
-      return res.status(404).json({message:"No Friends Found"})
+  try {
+    const userFriends = await UserFriendsList.findOne({ userId: id }).populate('friendsList.friendId', 'name email userName')
+    if (!userFriends) {
+      return res.status(404).json({ message: "No Friends Found" })
     }
-    const friendsList = userFriends.friendsList.filter((friend)=>friend.status==='accepted').map((friend)=>friend.friendId)
-    res.status(200).json({message:"Friends List",friendsList})
-    
+    const friendsList = userFriends.friendsList.filter((friend) => friend.status === 'accepted').map((friend) => friend.friendId)
+    res.status(200).json({ message: "Friends List", friendsList })
+
   }
-  catch(err){
+  catch (err) {
     return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 }
+
+
 
 
 
@@ -394,5 +399,5 @@ module.exports = {
   getUserId,
   getUserByUserName,
   addFriend,
-  getMyFriends
+  getMyFriends,
 };

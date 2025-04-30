@@ -10,6 +10,7 @@ const {
     getUserByUserName,
     addFriend,
     getMyFriends,
+    getUser,
 } = require('../Controllers/userControllers');
 const authenticateToken = require('../Middlewares/JWT');
 const { sendMessage, getAllMessages } = require('../Controllers/messageController');
@@ -28,6 +29,8 @@ router.post('/verifyOTP', verifyOTP); // route to verify OTP
 router.post('/resetPassword', resetPassword)
 router.post('/addFriend',authenticateToken, addFriend)
 router.get('/getMyFriends',authenticateToken,getMyFriends)
+
+
 
 
 

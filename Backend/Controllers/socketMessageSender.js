@@ -39,7 +39,6 @@ const socketPrivateMessageSender = (socket) => {
 
 const requestHandler = (socket) => {
     socket.on('requests', async ({ requestStatus, friendId }) => {
-        console.log(friendId)
         const userId = socket.user.id;
         try {
             if (requestStatus !== 'accepted' && requestStatus !== 'rejected') {
@@ -51,10 +50,16 @@ const requestHandler = (socket) => {
                         'friendsList.$.status': requestStatus
                     }
                 })
+                await UserFriendsList.updateOne({ userId:friendId, 'friendsList.friendId': userId }, {
+                    $set: {
+                        'friendsList.$.status': requestStatus
+                    }
+                })
+                const socketId = await Mapper.findOne({ userId: friendId });
                 if (result.modifiedCount === 0) {
-                    socket.to(friendId).emit('notification', { message: 'Friend not found' });
+                    socket.to(socketId.socketId).emit('notification', { message: 'Friend not found' });
                 } else {
-                    socket.to(friendId).emit('notification', { message: `Request ${requestStatus}` });
+                    socket.to(socketId.socketId).emit('notification', { message: `Request ${requestStatus}` });
                 }
             }
         }
