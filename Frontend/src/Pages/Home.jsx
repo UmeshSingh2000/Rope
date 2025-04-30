@@ -40,7 +40,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  // const [messages, setMessages] = useState([]);
   const [currentUserId, setCurrentUserId] = useState("");
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
@@ -51,8 +50,6 @@ export default function Home() {
         withCredentials: true,
       });
       setCurrentUserId(response.data.id);
-      // console.log(response.data.id);
-      toast.success("Got Id");
     } catch (error) {
       toast.error(error?.response?.data.message || "Something went wrong");
     }
@@ -87,7 +84,6 @@ export default function Home() {
       });
       dispatch(setFriends(response.data.friendsList));
       setFilteredFriend(response.data.friendsList || []);
-      toast.success(response.data.message);
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
@@ -105,8 +101,6 @@ export default function Home() {
         { withCredentials: true }
       );
       dispatch(setMessages(response.data));
-      // setMessages(response.data);
-      // console.log(response.data.map((message) => message));
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
@@ -123,9 +117,7 @@ export default function Home() {
   }, [selectedChat]);
 
   useEffect(() => {
-    // if(friends.length < 0) {
     getFriends();
-    // }
   }, []);
 
   const localSearch = () => {
