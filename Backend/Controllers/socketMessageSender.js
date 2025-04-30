@@ -3,15 +3,10 @@ const { sendMessage } = require('./messageController')
 const UserFriendsList = require('../models/userFriendsList')
 const socketPrivateMessageSender = (socket) => {
     socket.on('sendMessage', async ({ to, message }) => {
-        
+
         try {
             const receiver = await Mapper.findOne({ userId: to });
-            const savedMessage = await sendMessage({
-                senderId: socket.user.id,
-                receiverId: receiver.userId, // make sure userId exists in your Mapper schema
-                text: message,
-                textType: 'text'
-            });
+
             if (!receiver) {
                 return socket.emit('userNotFound', { message: 'User not found' });
             }
@@ -21,9 +16,13 @@ const socketPrivateMessageSender = (socket) => {
             if (!receiverSocketId) {
                 return socket.emit('userNotFound', { message: 'User not found' });
             }
-
             // Save message in DB
-
+            const savedMessage = await sendMessage({
+                senderId: socket.user.id,
+                receiverId: receiver.userId, // make sure userId exists in your Mapper schema
+                text: message,
+                textType: 'text'
+            });
             // Emit message to receiver
             socket.to(receiverSocketId).emit('receiveMessage', {
                 message: savedMessage.text,
@@ -52,7 +51,7 @@ const requestHandler = (socket) => {
                         'friendsList.$.status': requestStatus
                     }
                 })
-                await UserFriendsList.updateOne({ userId:friendId, 'friendsList.friendId': userId }, {
+                await UserFriendsList.updateOne({ userId: friendId, 'friendsList.friendId': userId }, {
                     $set: {
                         'friendsList.$.status': requestStatus
                     }

@@ -381,6 +381,21 @@ const getMyFriends = async (req, res) => {
 }
 
 
+const userLogout = async(req,res)=>{
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    res.status(200).json({ message: "Logout Success" });
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+}
+
+
 
 
 
@@ -400,4 +415,5 @@ module.exports = {
   getUserByUserName,
   addFriend,
   getMyFriends,
+  userLogout
 };
