@@ -78,12 +78,12 @@ export default function Home() {
   };
 
   const sendMessage=()=>{
-    console.log("Sending message to: ", selectedChat._id);
+    console.log("Sending message to: ", selectedChat.userName);
     console.log("Message content: ", "Hi");
     socket.emit("sendMessage", {
 
       // senderId: currentUserId,
-      to: selectedChat._id,
+      to: selectedChat.userName,
       message:"Hi",
     });
   }
