@@ -8,6 +8,7 @@ const { Server } = require('socket.io'); // importing socket.io
 
 const {chatSockets} = require('./Sockets/chatSockets')
 
+const { swaggerUi, swaggerSpec } = require('./swagger'); // import Swagger
 
 const userRoutes = require('./Routes/userRoutes')
 const makeDbConnection = require('./Configuration/dbConnections');
@@ -49,6 +50,9 @@ app.use(cors({
 app.use('/api', userRoutes);
 app.use('/api', verifyTokenRoute)
 
+// Swagger API documentation route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 
 
@@ -58,6 +62,17 @@ app.use('/api', verifyTokenRoute)
 /**
  * @description Health check route
  * @route GET /
+ */
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Health check route
+ *     description: This endpoint is used to check if the server is running and healthy.
+ *     responses:
+ *       200:
+ *         description: Server is healthy
  */
 app.get('/', (req, res) => {
     res.json({ message: "Server is healthy" });

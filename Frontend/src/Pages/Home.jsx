@@ -216,7 +216,9 @@ export default function Home() {
         <div className="hidden md:flex flex-col w-20 h-full bg-[#0d0d0d] border-r border-gray-800">
 
           <div className="flex justify-center items-center h-20 border-b border-gray-800">
-            <img src={logo} alt="Logo" className="w-20 h-20 rounded-full" />
+            <img src={logo} onClick={()=>{
+              window.open('http://localhost:3000/api-docs/','_blank')
+            }} alt="Logo" className="w-20 h-20 rounded-full cursor-pointer" />
           </div>
 
           <div className="flex flex-col items-center space-y-6 text-gray-400 text-lg mt-6">
