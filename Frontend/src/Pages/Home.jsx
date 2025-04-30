@@ -77,6 +77,17 @@ export default function Home() {
     }
   };
 
+  const sendMessage=()=>{
+    console.log("Sending message to: ", selectedChat._id);
+    console.log("Message content: ", "Hi");
+    socket.emit("sendMessage", {
+
+      // senderId: currentUserId,
+      to: selectedChat._id,
+      message:"Hi",
+    });
+  }
+
   const getFriends = async () => {
     try {
       const response = await axios.get(`${URL}/getMyFriends`, {
@@ -418,7 +429,7 @@ export default function Home() {
                   placeholder="Type your message..."
                   className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
                 />
-                <button className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-full text-white">
+                <button onClick={sendMessage} className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-full text-white">
                   <FontAwesomeIcon icon={faPaperPlane} />
                 </button>
               </div>
