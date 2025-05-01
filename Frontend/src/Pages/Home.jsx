@@ -421,42 +421,51 @@ export default function Home() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-2 flex flex-col">
-                {messages.map((message) => {
-                  const isOwnMessage = message.senderId._id === currentUserId;
-                  const bubbleStyles = isOwnMessage
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-300 text-black";
+                {[...messages]
+                  .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                  .map((message) => {
+                    const isOwnMessage = message.senderId._id === currentUserId;
+                    const bubbleStyles = isOwnMessage
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-300 text-black";
 
-                  return (
-                    <div
-                      key={message._id}
-                      className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
-                        }`}
-                    >
+                    return (
                       <div
-                        className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                        key={message._id}
+                        className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
+                          }`}
                       >
-                        <div className="flex items-end gap-5">
-                          <span className="text-base">{message.text}</span>
-                          {isOwnMessage &&
-                            (message.isRead ? (
-                              <FontAwesomeIcon
-                                icon={faCheckDouble}
-                                size="sm"
-                                className="text-blue-300"
-                              />
-                            ) : (
-                              <FontAwesomeIcon
-                                icon={faCheck}
-                                size="sm"
-                                className="text-gray-300"
-                              />
-                            ))}
+                        <div
+                          className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                        >
+                          <div className="flex items-end gap-5">
+                            <span className="text-base">{message.text}</span>
+                            <span className="text-xs text-black mt-1">
+                              {new Date(message.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              })}
+                            </span>
+                            {isOwnMessage &&
+                              (message.isRead ? (
+                                <FontAwesomeIcon
+                                  icon={faCheckDouble}
+                                  size="sm"
+                                  className="text-blue-300"
+                                />
+                              ) : (
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  size="sm"
+                                  className="text-gray-300"
+                                />
+                              ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
 
               {/* Input */}
