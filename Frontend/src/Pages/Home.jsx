@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPaperPlane,
@@ -20,7 +20,7 @@ import { CustomToast } from "@/components/CustomToast";
 import Loader from "@/components/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "@/Redux/Features/User/friendsSlice";
-import { setMessages } from "@/Redux/Features/Messages/messagesSlice";
+import { setMessages ,addMessage } from "@/Redux/Features/Messages/messagesSlice";
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
@@ -44,6 +44,7 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [currentUserId, setCurrentUserId] = useState("");
   const [message, setMessage] = useState("");
+  const messagesEndRef = useRef(null);
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
 
@@ -81,11 +82,14 @@ export default function Home() {
   };
 
   const sendMessage = () => {
+    if(!message.trim()) return; 
     socket.emit("sendMessage", {
       // senderId: currentUserId,
       to: selectedChat._id,
-      message: message,
+      message,
     });
+
+    setMessage("");
   };
 
   const getFriends = async () => {
@@ -225,6 +229,33 @@ export default function Home() {
       socket.off("receiveMessage");
     };
   }, [socket]);
+
+// Listen for new messages from the server
+  useEffect(() => {
+    if(!socket) return;
+
+    socket.on("newMessage", (message) => {
+      console.log("New message received: ", message);
+      dispatch(addMessage(message));
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [socket, dispatch]);
+
+  // render messages when they are updated
+  useEffect(() => {
+    // toast.success("Messages updated: ", messages);
+    console.log("Messages updated: ", messages);
+  }, [messages]);
+  
+  // scroll to bottom when new message is added
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
@@ -466,6 +497,7 @@ export default function Home() {
                       </div>
                     );
                   })}
+                  <div ref={messagesEndRef} /> {/* Scroll to this div */}
               </div>
 
               {/* Input */}
@@ -475,6 +507,11 @@ export default function Home() {
                   placeholder="Type your message..."
                   className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
                   onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e)=>{
+                    if(e.key === "Enter"){
+                      sendMessage();
+                    }
+                  }}
                   value={message}
                 />
                 <button

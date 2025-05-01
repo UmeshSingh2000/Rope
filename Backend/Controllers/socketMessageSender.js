@@ -30,6 +30,10 @@ const socketPrivateMessageSender = (socket) => {
                 timestamp: savedMessage.createdAt
             });
 
+            // Emit newMessage event to both sender and receiver
+            socket.emit('newMessage',savedMessage);
+            socket.to(receiverSocketId).emit('newMessage', savedMessage);
+
         } catch (error) {
             console.error(error.message);
             socket.emit('messageError', { message: error.message });

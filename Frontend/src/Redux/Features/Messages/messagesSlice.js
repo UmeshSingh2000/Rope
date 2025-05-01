@@ -10,11 +10,13 @@ export const messagesSlice = createSlice({
   reducers: {
    setMessages:(state,action)=>{
     state.value=action.payload
+   },
+   addMessage:(state,action)=>{
+    state.value.push(action.payload)
    }
   },
 })
 
-// Action creators are generated for each case reducer function
-export const { setMessages } = messagesSlice.actions
+export const { setMessages, addMessage } = messagesSlice.actions
 
 export default messagesSlice.reducer
