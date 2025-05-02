@@ -48,10 +48,8 @@ export default function Home() {
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
 
+  console.log(userName)
 
-  /**
-   * @description Fetch the current user's ID from the server
-  */
   const getId = async () => {
     try {
       const response = await axios.get(`${URL}/getMyId`, {
@@ -215,6 +213,7 @@ export default function Home() {
             { userName },
             { withCredentials: true }
           );
+
           setUsers(response.data.user ? [response.data.user] : []);
         } catch (error) {
           setUsers([]);
@@ -272,7 +271,6 @@ export default function Home() {
     };
   }, [socket]);
 
-  
   // Listen for new messages from the server
   useEffect(() => {
     if (!socket) return;
@@ -498,7 +496,10 @@ export default function Home() {
                 {[...messages]
                   .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                   .map((message) => {
-                    const isOwnMessage = message.senderId._id === currentUserId;
+                    const isOwnMessage =
+                      message.senderId === currentUserId ||
+                      message.senderId?._id === currentUserId;
+
                     const bubbleStyles = isOwnMessage
                       ? "bg-blue-500 text-white"
                       : "bg-gray-300 text-black";
