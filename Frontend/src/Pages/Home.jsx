@@ -48,6 +48,8 @@ export default function Home() {
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
 
+  console.log(userName)
+
   const getId = async () => {
     try {
       const response = await axios.get(`${URL}/getMyId`, {
@@ -178,6 +180,7 @@ export default function Home() {
             { userName },
             { withCredentials: true }
           );
+          
           setUsers(response.data.user ? [response.data.user] : []);
         } catch (error) {
           setUsers([]);
