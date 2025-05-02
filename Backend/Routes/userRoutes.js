@@ -90,6 +90,6 @@ router.post('/getAllMessages', authenticateToken, getAllMessages)
  * @route GET api/getUserByUserName
  * @access Private
  */
-router.get('/getUserByUserName', authenticateToken, getUserByUserName)
+router.post('/getUserByUserName', authenticateToken, getUserByUserName)
 
 module.exports = router;

@@ -130,6 +130,7 @@ export default function Home() {
    * @description Fetch all messages for the selected chat
    */
   const getMessages = async (receiverId) => {
+    
     try {
       const response = await axios.post(
         `${URL}/getAllMessages`,
@@ -148,6 +149,7 @@ export default function Home() {
 
   // Fetch messages when the selected chat changes
   useEffect(() => {
+    if(!selectedChat) return;
     if (selectedChat) {
       getMessages(selectedChat._id);
     }

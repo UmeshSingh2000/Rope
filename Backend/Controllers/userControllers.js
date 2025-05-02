@@ -229,7 +229,7 @@ const resetPassword = async (req, res) => {
 
 /**
  * @description Get User Id
- * @route POST api/getMyId
+ * @route GET api/getMyId
  * @access Private
  */
 
