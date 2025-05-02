@@ -20,7 +20,7 @@ import { CustomToast } from "@/components/CustomToast";
 import Loader from "@/components/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "@/Redux/Features/User/friendsSlice";
-import { setMessages ,addMessage } from "@/Redux/Features/Messages/messagesSlice";
+import { setMessages, addMessage } from "@/Redux/Features/Messages/messagesSlice";
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
@@ -84,7 +84,7 @@ export default function Home() {
   };
 
   const sendMessage = () => {
-    if(!message.trim()) return; 
+    if (!message.trim()) return;
     socket.emit("sendMessage", {
       // senderId: currentUserId,
       to: selectedChat._id,
@@ -180,7 +180,7 @@ export default function Home() {
             { userName },
             { withCredentials: true }
           );
-          
+
           setUsers(response.data.user ? [response.data.user] : []);
         } catch (error) {
           setUsers([]);
@@ -233,9 +233,9 @@ export default function Home() {
     };
   }, [socket]);
 
-// Listen for new messages from the server
+  // Listen for new messages from the server
   useEffect(() => {
-    if(!socket) return;
+    if (!socket) return;
 
     socket.on("newMessage", (message) => {
       console.log("New message received: ", message);
@@ -252,7 +252,7 @@ export default function Home() {
     // toast.success("Messages updated: ", messages);
     console.log("Messages updated: ", messages);
   }, [messages]);
-  
+
   // scroll to bottom when new message is added
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -458,7 +458,10 @@ export default function Home() {
                 {[...messages]
                   .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                   .map((message) => {
-                    const isOwnMessage = message.senderId._id === currentUserId;
+                    const isOwnMessage =
+                      message.senderId === currentUserId ||
+                      message.senderId?._id === currentUserId;
+
                     const bubbleStyles = isOwnMessage
                       ? "bg-blue-500 text-white"
                       : "bg-gray-300 text-black";
@@ -500,7 +503,7 @@ export default function Home() {
                       </div>
                     );
                   })}
-                  <div ref={messagesEndRef} /> {/* Scroll to this div */}
+                <div ref={messagesEndRef} /> {/* Scroll to this div */}
               </div>
 
               {/* Input */}
@@ -510,8 +513,8 @@ export default function Home() {
                   placeholder="Type your message..."
                   className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={(e)=>{
-                    if(e.key === "Enter"){
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
                       sendMessage();
                     }
                   }}
