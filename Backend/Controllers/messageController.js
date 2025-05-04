@@ -55,7 +55,7 @@ const getAllMessages = async (req, res) => {
                 { senderId, receiverId },
                 { senderId: receiverId, receiverId: senderId }
             ]
-        }).sort({ createdAt: -1 }).populate("senderId", "name email").populate("receiverId", "name email");
+        }).sort({ createdAt: -1 })
 
         res.status(200).json(messages);
     }

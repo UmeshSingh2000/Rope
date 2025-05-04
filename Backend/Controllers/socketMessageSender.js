@@ -3,14 +3,13 @@ const { sendMessage } = require('./messageController')
 const UserFriendsList = require('../models/userFriendsList')
 const socketPrivateMessageSender = (socket) => {
     socket.on('sendMessage', async ({ to, message }) => {
-
         try {
             const receiver = await Mapper.findOne({ userId: to });
 
             if (!receiver) {
                 return socket.emit('userNotFound', { message: 'User not found' });
             }
- 
+
             const receiverSocketId = receiver.socketId;
             if (!receiverSocketId) {
                 return socket.emit('userNotFound', { message: 'User not found' });
@@ -23,16 +22,20 @@ const socketPrivateMessageSender = (socket) => {
                 textType: 'text'
             });
             // Emit message to receiver
-            socket.to(receiverSocketId).emit('receiveMessage', {
-                message: savedMessage.text,
-                from: savedMessage.senderId,
-                textType: savedMessage.textType,
-                timestamp: savedMessage.createdAt
-            });
+            // socket.to(receiverSocketId).emit('receiveMessage', {
+            //     message: savedMessage.text,
+            //     from: savedMessage.senderId,
+            //     textType: savedMessage.textType,
+            //     timestamp: savedMessage.createdAt
+            // });
 
             // Emit newMessage event to both sender and receiver
-            socket.emit('newMessage',savedMessage);
-            socket.to(receiverSocketId).emit('newMessage', savedMessage);
+            socket.to(receiverSocketId).emit('newMessage', { message: savedMessage, id: socket.user.id });
+            socket.emit('messageSentSuccess', {
+                success: true,
+                message: 'Message sent successfully',
+                messageDetails: savedMessage
+            });
 
         } catch (error) {
             console.error(error.message);

@@ -34,21 +34,22 @@ const members = [
 export default function Home() {
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friends.value);
-  const messages = useSelector((state) => state.messages.value);
+  const [selectedChat, setSelectedChat] = useState(null);
+  // const [messages,setMessages] = useState([]);
+  const messages = useSelector((state) => state.messages.value[selectedChat?._id] || []);
+
 
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState("");
   const [filteredFriend, setFilteredFriend] = useState(friends);
   const [loading, setLoading] = useState(false);
-  const [selectedChat, setSelectedChat] = useState(null);
+
   const [isMobile, setIsMobile] = useState(false);
   const [currentUserId, setCurrentUserId] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(""); // message send input field
   const messagesEndRef = useRef(null);
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
-
-  console.log(userName)
 
   const getId = async () => {
     try {
@@ -99,7 +100,10 @@ export default function Home() {
       to: selectedChat._id,
       message,
     });
-
+    // socket.on('messageSentSuccess', ({ messageDetails }) => {
+    //   console.log("message", messageDetails);
+    //   dispatch(setMessages({ id: selectedChat._id, message: messageDetails }))
+    // })
     setMessage("");
   };
 
@@ -128,14 +132,13 @@ export default function Home() {
    * @description Fetch all messages for the selected chat
    */
   const getMessages = async (receiverId) => {
-    
     try {
       const response = await axios.post(
         `${URL}/getAllMessages`,
         { receiverId },
         { withCredentials: true }
       );
-      dispatch(setMessages(response.data));
+      dispatch(setMessages({ id: receiverId, message: response.data }));
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
@@ -147,7 +150,7 @@ export default function Home() {
 
   // Fetch messages when the selected chat changes
   useEffect(() => {
-    if(!selectedChat) return;
+    if (messages.length > 0) return
     if (selectedChat) {
       getMessages(selectedChat._id);
     }
@@ -251,7 +254,7 @@ export default function Home() {
     });
     socket.on("notification", (data) => {
       if (data.message) {
-        if ((data.message = "Request accepted")) {
+        if ((data.message === "Request accepted")) {
           getFriends();
         }
         toast.success(data.message);
@@ -260,14 +263,13 @@ export default function Home() {
       }
     });
 
-    socket.on('receiveMessage', ({ message, from, textType }) => {
-      console.log("Received message: ", message, "from: ", from, "textType: ", textType);
-    })
+
+
     return () => {
       socket.off("connect");
       socket.off("friendRequestReceived");
       socket.off("notification");
-      socket.off("receiveMessage");
+      socket.off('messageSentSuccess', handleMessageSent);
     };
   }, [socket]);
 
@@ -275,21 +277,31 @@ export default function Home() {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("newMessage", (message) => {
-      console.log("New message received: ", message);
-      dispatch(addMessage(message));
+    socket.on("newMessage", ({ message, id }) => {
+      dispatch(setMessages({ id, message }));
     });
 
     return () => {
       socket.off("newMessage");
     };
-  }, [socket, dispatch]);
+  }, [socket]);
 
-  // render messages when they are updated
   useEffect(() => {
-    // toast.success("Messages updated: ", messages);
-    console.log("Messages updated: ", messages);
-  }, [messages]);
+    const handleMessageSent = ({ messageDetails }) => {
+      dispatch(setMessages({ id: selectedChat?._id, message: messageDetails }));
+    };
+
+    socket.on('messageSentSuccess', handleMessageSent);
+    return () => {
+      socket.off('messageSentSuccess', handleMessageSent);
+    };
+  },[socket, selectedChat]);
+
+  // // render messages when they are updated
+  // useEffect(() => {
+  //   // toast.success("Messages updated: ", messages);
+  //   console.log("Messages updated: ", messages);
+  // }, [messages]);
 
   // scroll to bottom when new message is added
   useEffect(() => {
@@ -363,7 +375,8 @@ export default function Home() {
                         <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
                           {users.map((user, i) => (
                             <div
-                              key={`search-${i}`}
+                              key={user._id}
+                              // key={`search-${i}`}
                               className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
                               onClick={() => {
                                 setSelectedChat(user);
@@ -410,7 +423,8 @@ export default function Home() {
               <div className="space-y-4">
                 {filteredFriend.map((friend, i) => (
                   <div
-                    key={`friend-${i}`}
+                    // key={`friend-${i}`}
+                    key={friend._id}
                     className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
                     onClick={() => setSelectedChat(friend)}
                   >
@@ -497,8 +511,7 @@ export default function Home() {
                   .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                   .map((message) => {
                     const isOwnMessage =
-                      message.senderId === currentUserId ||
-                      message.senderId?._id === currentUserId;
+                      message.senderId === currentUserId
 
                     const bubbleStyles = isOwnMessage
                       ? "bg-blue-500 text-white"
@@ -541,7 +554,7 @@ export default function Home() {
                       </div>
                     );
                   })}
-                <div ref={messagesEndRef} /> {/* Scroll to this div */}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Input */}
