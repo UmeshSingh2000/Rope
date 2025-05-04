@@ -306,7 +306,7 @@ export default function Home() {
   // scroll to bottom when new message is added
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({behavior:"auto"});
     }
   }, [messages]);
 
@@ -340,6 +340,30 @@ export default function Home() {
             </button>
           </div>
         </div>
+        {/* Mobile Bottom Navigation Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d0d] border-t border-gray-800 flex justify-around items-center py-2 md:hidden">
+          <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Chats">
+            <FontAwesomeIcon icon={faPaperPlane} className="text-xl" />
+            <span className="text-xs">Chats</span>
+          </button>
+          <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Groups">
+            <FontAwesomeIcon icon={faVideo} className="text-xl" />
+            <span className="text-xs">Groups</span>
+          </button>
+          <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Calls">
+            <FontAwesomeIcon icon={faPhone} className="text-xl" />
+            <span className="text-xs">Calls</span>
+          </button>
+          <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Settings">
+            <FontAwesomeIcon icon={faGear} className="text-xl" />
+            <span className="text-xs">Settings</span>
+          </button>
+          <button onClick={handleLogout} className="flex flex-col items-center text-gray-400 hover:text-white" title="Logout">
+            <FontAwesomeIcon icon={faRightFromBracket} className="text-xl" />
+            <span className="text-xs">Logout</span>
+          </button>
+        </div>
+
 
         {/* Left Panel */}
         <div
@@ -352,7 +376,7 @@ export default function Home() {
             {/* Search Bar */}
             <div className="p-4 border-b border-gray-800 relative">
               <div className="flex justify-between">
-                <h2 className="text-lg font-semibold mb-4">Search</h2>
+                <h2 className="text-lg font-semibold mb-4">Rope Messenger</h2>
               </div>
 
               <div className="p-4 relative">
@@ -524,11 +548,11 @@ export default function Home() {
                           }`}
                       >
                         <div
-                          className={`rounded-2xl p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                          className={`rounded-md p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
                         >
-                          <div className="flex items-end gap-5">
+                          <div className="flex items-end gap-2 h-5">
                             <span className="text-base">{message.text}</span>
-                            <span className="text-xs text-black mt-1">
+                            <span className="text-xs text-black opacity-50">
                               {new Date(message.createdAt).toLocaleTimeString([], {
                                 hour: "2-digit",
                                 minute: "2-digit",
@@ -558,11 +582,11 @@ export default function Home() {
               </div>
 
               {/* Input */}
-              <div className="mt-4 flex items-center">
+              <div className="mt-4 flex items-center pb-8 md:pb-0">
                 <input
                   type="text"
                   placeholder="Type your message..."
-                  className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-full outline-none"
+                  className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-md h-12 outline-none"
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -573,7 +597,7 @@ export default function Home() {
                 />
                 <button
                   onClick={sendMessage}
-                  className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-full text-white"
+                  className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-md text-white cursor-pointer"
                 >
                   <FontAwesomeIcon icon={faPaperPlane} />
                 </button>
