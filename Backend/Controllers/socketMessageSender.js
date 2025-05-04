@@ -21,16 +21,11 @@ const socketPrivateMessageSender = (socket) => {
                 text: message,
                 textType: 'text'
             });
-            // Emit message to receiver
-            // socket.to(receiverSocketId).emit('receiveMessage', {
-            //     message: savedMessage.text,
-            //     from: savedMessage.senderId,
-            //     textType: savedMessage.textType,
-            //     timestamp: savedMessage.createdAt
-            // });
 
             // Emit newMessage event to both sender and receiver
             socket.to(receiverSocketId).emit('newMessage', { message: savedMessage, id: socket.user.id });
+            socket.to(receiverSocketId).emit('notification', { message: 'New message received' });
+            //self emiting messege for confirmation
             socket.emit('messageSentSuccess', {
                 success: true,
                 message: 'Message sent successfully',

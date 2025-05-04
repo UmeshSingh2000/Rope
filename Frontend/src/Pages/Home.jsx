@@ -257,6 +257,7 @@ export default function Home() {
         if ((data.message === "Request accepted")) {
           getFriends();
         }
+        if(data.message)
         toast.success(data.message);
       } else {
         toast.error("Something went wrong");
@@ -295,7 +296,7 @@ export default function Home() {
     return () => {
       socket.off('messageSentSuccess', handleMessageSent);
     };
-  },[socket, selectedChat]);
+  }, [socket, selectedChat]);
 
   // // render messages when they are updated
   // useEffect(() => {
@@ -306,7 +307,7 @@ export default function Home() {
   // scroll to bottom when new message is added
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({behavior:"auto"});
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
     }
   }, [messages]);
 
