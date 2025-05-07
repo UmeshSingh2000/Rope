@@ -21,6 +21,7 @@ import Loader from "@/components/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "@/Redux/Features/User/friendsSlice";
 import { setMessages, addMessage } from "@/Redux/Features/Messages/messagesSlice";
+import EmojiPicker from 'emoji-picker-react';
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
@@ -35,7 +36,7 @@ export default function Home() {
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friends.value);
   const [selectedChat, setSelectedChat] = useState(null);
-  // const [messages,setMessages] = useState([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messages = useSelector((state) => state.messages.value[selectedChat?._id] || []);
 
 
@@ -197,6 +198,10 @@ export default function Home() {
     }
   }
 
+  const onEmojiClick = (emojiData) => {
+    setMessage((prev) => prev + emojiData.emoji);
+  };
+
 
   // Fetch users based on username input
   // and filter friends based on local search
@@ -257,8 +262,8 @@ export default function Home() {
         if ((data.message === "Request accepted")) {
           getFriends();
         }
-        if(data.message)
-        toast.success(data.message);
+        if (data.message)
+          toast.success(data.message);
       } else {
         toast.error("Something went wrong");
       }
@@ -298,11 +303,6 @@ export default function Home() {
     };
   }, [socket, selectedChat]);
 
-  // // render messages when they are updated
-  // useEffect(() => {
-  //   // toast.success("Messages updated: ", messages);
-  //   console.log("Messages updated: ", messages);
-  // }, [messages]);
 
   // scroll to bottom when new message is added
   useEffect(() => {
@@ -584,6 +584,10 @@ export default function Home() {
 
               {/* Input */}
               <div className="mt-4 flex items-center pb-8 md:pb-0">
+                <button type="button" className="p-2 cursor-pointer text-2xl hover:bg-amber-100 rounded-full" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                  😀
+                </button>
+
                 <input
                   type="text"
                   placeholder="Type your message..."
@@ -603,6 +607,11 @@ export default function Home() {
                   <FontAwesomeIcon icon={faPaperPlane} />
                 </button>
               </div>
+              {showEmojiPicker && (
+                <div style={{ position: 'absolute', bottom: '80px' }}>
+                  <EmojiPicker onEmojiClick={onEmojiClick} />
+                </div>
+              )}
             </div>
           )}
         </div>
