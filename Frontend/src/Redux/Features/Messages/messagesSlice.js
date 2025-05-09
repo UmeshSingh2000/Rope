@@ -19,12 +19,18 @@ export const messagesSlice = createSlice({
       }
       return state
     },
-    addMessage: (state, action) => {
-      state.value.push(action.payload)
-    },
+    deleteMessages : (state,action)=>{
+      const { id,selectedChat } = action.payload
+      if(state.value[selectedChat]){
+        state.value[selectedChat] = state.value[selectedChat].filter((message)=>
+          message._id!==id
+        )
+      }
+      return state
+    }
     
   },
 })
 
-export const { setMessages, addMessage } = messagesSlice.actions
+export const { setMessages,deleteMessages } = messagesSlice.actions
 export default messagesSlice.reducer

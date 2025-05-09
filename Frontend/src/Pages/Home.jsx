@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPaperPlane,
@@ -9,6 +16,7 @@ import {
   faCheck,
   faGear,
   faRightFromBracket,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/Rope-Logo.png";
 import { io } from "socket.io-client";
@@ -20,7 +28,7 @@ import { CustomToast } from "@/components/CustomToast";
 import Loader from "@/components/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "@/Redux/Features/User/friendsSlice";
-import { setMessages, addMessage } from "@/Redux/Features/Messages/messagesSlice";
+import { deleteMessages, setMessages } from "@/Redux/Features/Messages/messagesSlice";
 import EmojiPicker from 'emoji-picker-react';
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
@@ -38,6 +46,8 @@ export default function Home() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messages = useSelector((state) => state.messages.value[selectedChat?._id] || []);
+
+
 
 
   const [users, setUsers] = useState([]);
@@ -201,6 +211,18 @@ export default function Home() {
   const onEmojiClick = (emojiData) => {
     setMessage((prev) => prev + emojiData.emoji);
   };
+
+  //delete message
+  const deleteMessage = async (messageId) => {
+    try {
+      const response = await axios.delete(`${URL}/deleteMessage/${messageId}`, { withCredentials: true });
+      dispatch(deleteMessages({id:messageId,selectedChat:selectedChat._id}))
+      toast.success(response.data.message);
+    }
+    catch (err) {
+      toast.error(err?.response?.data?.message || err.message || "Something went wrong")
+    }
+  }
 
 
   // Fetch users based on username input
@@ -543,40 +565,52 @@ export default function Home() {
                       : "bg-gray-300 text-black";
 
                     return (
-                      <div
-                        key={message._id}
-                        className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
-                          }`}
-                      >
-                        <div
-                          className={`rounded-md p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
-                        >
-                          <div className="flex items-end gap-2 h-5">
-                            <span className="text-base">{message.text}</span>
-                            <span className="text-xs text-black opacity-50">
-                              {new Date(message.createdAt).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: false,
-                              })}
-                            </span>
-                            {isOwnMessage &&
-                              (message.isRead ? (
-                                <FontAwesomeIcon
-                                  icon={faCheckDouble}
-                                  size="sm"
-                                  className="text-blue-300"
-                                />
-                              ) : (
-                                <FontAwesomeIcon
-                                  icon={faCheck}
-                                  size="sm"
-                                  className="text-gray-300"
-                                />
-                              ))}
+                      <ContextMenu key={message._id}>
+                        <ContextMenuTrigger>
+                          <div
+                            className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
+                              }`}
+                          >
+                            <div
+                              className={`rounded-md p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                            >
+                              <div className="flex items-end gap-2 h-5">
+                                <span className="text-base">{message.text}</span>
+                                <span className="text-xs text-black opacity-50">
+                                  {new Date(message.createdAt).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                  })}
+                                </span>
+                                {isOwnMessage &&
+                                  (message.isRead ? (
+                                    <FontAwesomeIcon
+                                      icon={faCheckDouble}
+                                      size="sm"
+                                      className="text-blue-300"
+                                    />
+                                  ) : (
+                                    <FontAwesomeIcon
+                                      icon={faCheck}
+                                      size="sm"
+                                      className="text-gray-300"
+                                    />
+                                  ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
+                        </ContextMenuTrigger>
+                        {
+                          isOwnMessage &&
+                          <ContextMenuContent className="bg-white rounded-md shadow-lg border border-gray-200">
+                            <ContextMenuItem onClick={() => deleteMessage(message._id)} className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors">
+                              Delete
+                              <FontAwesomeIcon className="ml-2 text-red-500" icon={faTrash} />
+                            </ContextMenuItem>
+                          </ContextMenuContent>
+                        }
+                      </ContextMenu>
                     );
                   })}
                 <div ref={messagesEndRef} />

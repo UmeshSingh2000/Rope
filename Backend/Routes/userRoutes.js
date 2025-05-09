@@ -13,7 +13,7 @@ const {
     userLogout,
 } = require('../Controllers/userControllers');
 const authenticateToken = require('../Middlewares/JWT');
-const { sendMessage, getAllMessages } = require('../Controllers/messageController');
+const { sendMessage, getAllMessages, deleteMessage } = require('../Controllers/messageController');
 
 /**
  * @description Get the authenticated user's ID
@@ -84,6 +84,7 @@ router.get('/logout', authenticateToken, userLogout)
  * @access Private
  */
 router.post('/getAllMessages', authenticateToken, getAllMessages)
+router.delete('/deleteMessage/:messageId', authenticateToken, deleteMessage)
 
 /**
  * @description Get user details by username

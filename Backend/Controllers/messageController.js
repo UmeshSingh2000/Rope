@@ -64,8 +64,26 @@ const getAllMessages = async (req, res) => {
     }
 }
 
+const deleteMessage = async (req, res) => {
+    try {
+        const { messageId } = req.params;
+        if (!messageId) {
+            return res.status(400).json({ message: "messageId is required" });
+        }
+        const deletedMessage  = await Message.findByIdAndDelete(messageId)
+        if (!deletedMessage ) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+        res.status(200).json({ message: "Message deleted for EveryOne" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
 
 module.exports = {
     sendMessage,
-    getAllMessages
+    getAllMessages,
+    deleteMessage
 }
