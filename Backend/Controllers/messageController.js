@@ -74,7 +74,7 @@ const deleteMessage = async (req, res) => {
         if (!deletedMessage ) {
             return res.status(404).json({ message: "Message not found" });
         }
-        res.status(200).json({ message: "Message deleted for EveryOne" });
+        res.status(200).json({ message: "Message deleted for Everyone" });
     }
     catch (err) {
         return res.status(500).json({ message: "Internal server error", error: err.message });

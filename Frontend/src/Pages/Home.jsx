@@ -47,6 +47,9 @@ export default function Home() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messages = useSelector((state) => state.messages.value[selectedChat?._id] || []);
 
+  useEffect(() => {
+    console.log(messages)
+  }, [messages])
 
 
 
@@ -216,7 +219,7 @@ export default function Home() {
   const deleteMessage = async (messageId) => {
     try {
       const response = await axios.delete(`${URL}/deleteMessage/${messageId}`, { withCredentials: true });
-      dispatch(deleteMessages({id:messageId,selectedChat:selectedChat._id}))
+      dispatch(deleteMessages({ id: messageId, selectedChat: selectedChat._id }))
       toast.success(response.data.message);
     }
     catch (err) {
