@@ -135,7 +135,6 @@ export default function Home() {
     const timerId = setTimeout(() => {
       const fetchUser = async () => {
         setLoading(true);
-
         try {
           const response = await axios.post(
             `${URL}/getUserByUsername`,
