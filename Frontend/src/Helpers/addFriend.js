@@ -1,5 +1,6 @@
 import axios from "axios";
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
+import getFriends from "./getFriends";
 const addFriend = async (friendId,toast) => {    
     try {
         const response = await axios.post(
