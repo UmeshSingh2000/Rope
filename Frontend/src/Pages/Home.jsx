@@ -27,7 +27,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CustomToast } from "@/components/CustomToast";
 import Loader from "@/components/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "@/Redux/Features/User/friendsSlice";
 import { deleteMessages, setMessages } from "@/Redux/Features/Messages/messagesSlice";
 import EmojiPicker from 'emoji-picker-react';
 import getId from "@/Helpers/getId";
