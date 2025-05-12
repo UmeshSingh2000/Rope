@@ -30,6 +30,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "@/Redux/Features/User/friendsSlice";
 import { deleteMessages, setMessages } from "@/Redux/Features/Messages/messagesSlice";
 import EmojiPicker from 'emoji-picker-react';
+import getId from "@/Helpers/getId";
+import addFriend from "@/Helpers/addFriend";
+import getFriends from "@/Helpers/getFriends";
+import getMessages from "@/Helpers/getMessages";
+import sendMessage from "@/Helpers/sendMessage";
+import handleLogout from "@/Helpers/handleLogout";
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
@@ -47,12 +53,6 @@ export default function Home() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messages = useSelector((state) => state.messages.value[selectedChat?._id] || []);
 
-  useEffect(() => {
-    console.log(messages)
-  }, [messages])
-
-
-
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState("");
   const [filteredFriend, setFilteredFriend] = useState(friends);
@@ -65,108 +65,17 @@ export default function Home() {
 
   const socket = useMemo(() => io(SocketURL, { withCredentials: true }), []);
 
-  const getId = async () => {
-    try {
-      const response = await axios.get(`${URL}/getMyId`, {
-        withCredentials: true,
-      });
-      setCurrentUserId(response.data.id);
-    } catch (error) {
-      toast.error(error?.response?.data.message || "Something went wrong");
-    }
-  };
 
   // Fetch the current user's ID when the component mounts
   useEffect(() => {
-    getId();
+    getId(setCurrentUserId, toast);
   }, []);
-
-
-  /**
-   * @description Add a friend to the user's friend list
-   */
-  const addFriend = async (friendId) => {
-    try {
-      const response = await axios.post(
-        `${URL}/addFriend`,
-        { friendId },
-        { withCredentials: true }
-      );
-      toast.success(response.data.message);
-      getFriends();
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-        error.message ||
-        "Something went wrong"
-      );
-    }
-  };
-
-
-  /**
-   * @description Send message to the selected chat
-   */
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    socket.emit("sendMessage", {
-      // senderId: currentUserId,
-      to: selectedChat._id,
-      message,
-    });
-    // socket.on('messageSentSuccess', ({ messageDetails }) => {
-    //   console.log("message", messageDetails);
-    //   dispatch(setMessages({ id: selectedChat._id, message: messageDetails }))
-    // })
-    setMessage("");
-  };
-
-
-  /**
-   * @description Fetch all friends of the user
-   */
-  const getFriends = async () => {
-    try {
-      const response = await axios.get(`${URL}/getMyFriends`, {
-        withCredentials: true,
-      });
-      dispatch(setFriends(response.data.friendsList));
-      setFilteredFriend(response.data.friendsList || []);
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-        error.message ||
-        "Something went wrong"
-      );
-    }
-  };
-
-
-  /**
-   * @description Fetch all messages for the selected chat
-   */
-  const getMessages = async (receiverId) => {
-    try {
-      const response = await axios.post(
-        `${URL}/getAllMessages`,
-        { receiverId },
-        { withCredentials: true }
-      );
-      dispatch(setMessages({ id: receiverId, message: response.data }));
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-        error.message ||
-        "Something went Wrong"
-      );
-    }
-  };
 
   // Fetch messages when the selected chat changes
   useEffect(() => {
     if (messages.length > 0) return
     if (selectedChat) {
-      getMessages(selectedChat._id);
+      getMessages(selectedChat._id,dispatch,setMessages);
     }
   }, [selectedChat]);
 
@@ -174,7 +83,7 @@ export default function Home() {
   // Fetch friends when the component mounts
   // and when the socket connection is established
   useEffect(() => {
-    getFriends();
+    getFriends(dispatch, setFilteredFriend, toast);
   }, []);
 
 
@@ -196,20 +105,7 @@ export default function Home() {
     return filtered.length > 0;
   };
 
-  /**
-   * @description Logout function to clear cookies and redirect to login page
-   */
-  const handleLogout = async () => {
-    try {
-      const response = await axios.get(`${URL}/logout`, { withCredentials: true });
-      toast.success(response.data.message);
-
-      window.location.reload()
-    }
-    catch (error) {
-      toast.error(error?.response?.data?.message || error.message || "Something went wrong")
-    }
-  }
+  
 
   const onEmojiClick = (emojiData) => {
     setMessage((prev) => prev + emojiData.emoji);
@@ -280,12 +176,12 @@ export default function Home() {
   useEffect(() => {
     socket.on("connect", () => console.log("Connected to server"));
     socket.on("friendRequestReceived", ({ from, message, senderInfo }) => {
-      CustomToast(socket, from, message, senderInfo, getFriends);
+      CustomToast(socket, from, message, senderInfo, getFriends,setFilteredFriend,dispatch);
     });
     socket.on("notification", (data) => {
       if (data.message) {
         if ((data.message === "Request accepted")) {
-          getFriends();
+          getFriends(dispatch, setFilteredFriend, toast);
         }
         if (data.message)
           toast.success(data.message);
@@ -361,7 +257,7 @@ export default function Home() {
             <button className="hover:text-white" title="Settings">
               <FontAwesomeIcon icon={faGear} />
             </button>
-            <button onClick={handleLogout} className="hover:text-white cursor-pointer" title="Logout">
+            <button onClick={()=>handleLogout(toast)} className="hover:text-white cursor-pointer" title="Logout">
               <FontAwesomeIcon icon={faRightFromBracket} />
             </button>
           </div>
@@ -384,7 +280,7 @@ export default function Home() {
             <FontAwesomeIcon icon={faGear} className="text-xl" />
             <span className="text-xs">Settings</span>
           </button>
-          <button onClick={handleLogout} className="flex flex-col items-center text-gray-400 hover:text-white" title="Logout">
+          <button onClick={()=>handleLogout(toast)} className="flex flex-col items-center text-gray-400 hover:text-white" title="Logout">
             <FontAwesomeIcon icon={faRightFromBracket} className="text-xl" />
             <span className="text-xs">Logout</span>
           </button>
@@ -449,7 +345,7 @@ export default function Home() {
                               <Button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  addFriend(user._id);
+                                  addFriend(user._id,toast);
                                 }}
                                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
                               >
@@ -632,13 +528,13 @@ export default function Home() {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      sendMessage();
+                      sendMessage(socket, setMessage, message, selectedChat._id);
                     }
                   }}
                   value={message}
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={()=>sendMessage(socket, setMessage, message, selectedChat._id)}
                   className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-md text-white cursor-pointer"
                 >
                   <FontAwesomeIcon icon={faPaperPlane} />
