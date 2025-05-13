@@ -239,13 +239,13 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col items-center space-y-6 text-gray-400 text-lg mt-6">
-            <button onClick={() => setActivePage('chat')} className="hover:text-white" title="Chats">
+            <button onClick={() => setActivePage('chat')} className="hover:text-white cursor-pointer" title="Chats">
               <FontAwesomeIcon icon={faPaperPlane} />
             </button>
-            <button onClick={() => setActivePage('groups')} className="hover:text-white" title="Groups">
+            <button onClick={() => setActivePage('groups')} className="hover:text-white cursor-pointer" title="Groups">
               <FontAwesomeIcon icon={faVideo} />
             </button>
-            <button onClick={() => setActivePage('calls')} className="hover:text-white" title="Calls">
+            <button onClick={() => setActivePage('calls')} className="hover:text-white cursor-pointer" title="Calls">
               <FontAwesomeIcon icon={faPhone} />
             </button>
           </div>
@@ -285,15 +285,13 @@ export default function Home() {
 
 
         {/* Left Panel */}
-        <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-r-xl bg-[#1a1a1a] text-white shadow-lg">
-          <div
-            className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile
-              ? "-translate-x-full opacity-0"
-              : "translate-x-0 opacity-100"
-              }`}
-          >
-            {renderView(activePage)}
-            {activePage === "chat" &&
+        {renderView(activePage)}
+        {activePage === "chat" &&
+          <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-r-xl bg-[#1a1a1a] text-white shadow-lg">
+            <div
+  className={`absolute md:static w-full md:w-1/3 h-full z-10 bg-[#111] ${selectedChat && isMobile ? "hidden" : "block"}`}
+>
+
               <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
                 {/* Search Bar */}
                 <div className="p-4 border-b border-gray-800 relative">
@@ -389,138 +387,136 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            }
-          </div>
-          {/* Right Panel (Chat Window) */}
-          <div
-            className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat
-              ? "translate-x-0 opacity-100"
-              : "translate-x-full opacity-0 md:opacity-100"
-              }`}
-          >
-            {selectedChat && (
-              <div className="flex flex-col h-full p-4 sm:p-6">
-                {/* Header */}
-                <div className="flex items-center pb-4 border-b border-gray-800">
-                  {isMobile && (
-                    <button
-                      className="mr-4 text-gray-400"
-                      onClick={() => setSelectedChat(null)}
-                    >
-                      <FontAwesomeIcon icon={faArrowLeft} />
-                    </button>
-                  )}
-                  <div className="w-10 h-10 rounded-full bg-gray-600" />
-                  <div className="ml-3 overflow-hidden">
-                    <p className="font-semibold truncate">{selectedChat.name}</p>
-                    <p className="text-sm text-gray-400 truncate">
-                      {selectedChat.email}
-                    </p>
+            </div>
+            {/* Right Panel (Chat Window) */}
+            <div
+  className={`absolute md:static w-full md:w-2/3 h-full z-20 bg-[#1a1a1a] transition-all duration-500 ease-in-out transform ${selectedChat || !isMobile ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"}`}
+>
+
+              {selectedChat && (
+                <div className="flex flex-col h-full p-4 sm:p-6">
+                  {/* Header */}
+                  <div className="flex items-center pb-4 border-b border-gray-800">
+                    {isMobile && (
+                      <button
+                        className="mr-4 text-gray-400"
+                        onClick={() => setSelectedChat(null)}
+                      >
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                      </button>
+                    )}
+                    <div className="w-10 h-10 rounded-full bg-gray-600" />
+                    <div className="ml-3 overflow-hidden">
+                      <p className="font-semibold truncate">{selectedChat.name}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {selectedChat.email}
+                      </p>
+                    </div>
+                    <div className="ml-auto flex gap-4 text-gray-400 text-lg">
+                      <FontAwesomeIcon icon={faPhone} />
+                      <FontAwesomeIcon icon={faVideo} />
+                    </div>
                   </div>
-                  <div className="ml-auto flex gap-4 text-gray-400 text-lg">
-                    <FontAwesomeIcon icon={faPhone} />
-                    <FontAwesomeIcon icon={faVideo} />
-                  </div>
-                </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-2 flex flex-col">
-                  {[...messages]
-                    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                    .map((message) => {
-                      const isOwnMessage =
-                        message.senderId === currentUserId
+                  {/* Messages */}
+                  <div className="flex-1 overflow-y-auto space-y-4 mt-4 px-2 flex flex-col">
+                    {[...messages]
+                      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                      .map((message) => {
+                        const isOwnMessage =
+                          message.senderId === currentUserId
 
-                      const bubbleStyles = isOwnMessage
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-300 text-black";
+                        const bubbleStyles = isOwnMessage
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-300 text-black";
 
-                      return (
-                        <ContextMenu key={message._id}>
-                          <ContextMenuTrigger>
-                            <div
-                              className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
-                                }`}
-                            >
+                        return (
+                          <ContextMenu key={message._id}>
+                            <ContextMenuTrigger>
                               <div
-                                className={`rounded-md p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                                className={`flex ${isOwnMessage ? "justify-end" : "justify-start"
+                                  }`}
                               >
-                                <div className="flex items-end gap-2 h-5">
-                                  <span className="text-base">{message.text}</span>
-                                  <span className="text-xs text-black opacity-50">
-                                    {new Date(message.createdAt).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                      hour12: false,
-                                    })}
-                                  </span>
-                                  {isOwnMessage &&
-                                    (message.isRead ? (
-                                      <FontAwesomeIcon
-                                        icon={faCheckDouble}
-                                        size="sm"
-                                        className="text-blue-300"
-                                      />
-                                    ) : (
-                                      <FontAwesomeIcon
-                                        icon={faCheck}
-                                        size="sm"
-                                        className="text-gray-300"
-                                      />
-                                    ))}
+                                <div
+                                  className={`rounded-md p-3 max-w-[70%] break-words relative ${bubbleStyles}`}
+                                >
+                                  <div className="flex items-end gap-2 h-5">
+                                    <span className="text-base">{message.text}</span>
+                                    <span className="text-xs text-black opacity-50">
+                                      {new Date(message.createdAt).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: false,
+                                      })}
+                                    </span>
+                                    {isOwnMessage &&
+                                      (message.isRead ? (
+                                        <FontAwesomeIcon
+                                          icon={faCheckDouble}
+                                          size="sm"
+                                          className="text-blue-300"
+                                        />
+                                      ) : (
+                                        <FontAwesomeIcon
+                                          icon={faCheck}
+                                          size="sm"
+                                          className="text-gray-300"
+                                        />
+                                      ))}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </ContextMenuTrigger>
-                          {
-                            isOwnMessage &&
-                            <ContextMenuContent className="bg-white rounded-md shadow-lg border border-gray-200">
-                              <ContextMenuItem onClick={() => deleteMessage(message._id)} className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors">
-                                Delete
-                                <FontAwesomeIcon className="ml-2 text-red-500" icon={faTrash} />
-                              </ContextMenuItem>
-                            </ContextMenuContent>
-                          }
-                        </ContextMenu>
-                      );
-                    })}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {/* Input */}
-                <div className="mt-4 flex items-center pb-8 md:pb-0">
-                  <button type="button" className="p-2 cursor-pointer text-2xl hover:bg-amber-100 rounded-full" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-                    😀
-                  </button>
-
-                  <input
-                    type="text"
-                    placeholder="Type your message..."
-                    className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-md h-12 outline-none"
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        sendMessage(socket, setMessage, message, selectedChat._id);
-                      }
-                    }}
-                    value={message}
-                  />
-                  <button
-                    onClick={() => sendMessage(socket, setMessage, message, selectedChat._id)}
-                    className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-md text-white cursor-pointer"
-                  >
-                    <FontAwesomeIcon icon={faPaperPlane} />
-                  </button>
-                </div>
-                {showEmojiPicker && (
-                  <div style={{ position: 'absolute', bottom: '80px' }}>
-                    <EmojiPicker onEmojiClick={onEmojiClick} />
+                            </ContextMenuTrigger>
+                            {
+                              isOwnMessage &&
+                              <ContextMenuContent className="bg-white rounded-md shadow-lg border border-gray-200">
+                                <ContextMenuItem onClick={() => deleteMessage(message._id)} className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors">
+                                  Delete
+                                  <FontAwesomeIcon className="ml-2 text-red-500" icon={faTrash} />
+                                </ContextMenuItem>
+                              </ContextMenuContent>
+                            }
+                          </ContextMenu>
+                        );
+                      })}
+                    <div ref={messagesEndRef} />
                   </div>
-                )}
-              </div>
-            )}
+
+                  {/* Input */}
+                  <div className="mt-4 flex items-center pb-8 md:pb-0">
+                    <button type="button" className="p-2 cursor-pointer text-2xl hover:bg-amber-100 rounded-full" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                      😀
+                    </button>
+
+                    <input
+                      type="text"
+                      placeholder="Type your message..."
+                      className="flex-1 p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-l-md h-12 outline-none"
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          sendMessage(socket, setMessage, message, selectedChat._id);
+                        }
+                      }}
+                      value={message}
+                    />
+                    <button
+                      onClick={() => sendMessage(socket, setMessage, message, selectedChat._id)}
+                      className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-md text-white cursor-pointer"
+                    >
+                      <FontAwesomeIcon icon={faPaperPlane} />
+                    </button>
+                  </div>
+                  {showEmojiPicker && (
+                    <div style={{ position: 'absolute', bottom: '80px' }}>
+                      <EmojiPicker onEmojiClick={onEmojiClick} />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   );
