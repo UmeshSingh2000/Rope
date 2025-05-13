@@ -35,17 +35,15 @@ import getFriends from "@/Helpers/getFriends";
 import getMessages from "@/Helpers/getMessages";
 import sendMessage from "@/Helpers/sendMessage";
 import handleLogout from "@/Helpers/handleLogout";
+import { useNavigate } from "react-router-dom";
+import renderView from "@/Helpers/renderView";
 
 const SocketURL = import.meta.env.VITE_SOCKET_API;
 const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
-const members = [
-  { name: "Sofia Davis", email: "m@example.com", role: "Owner" },
-  { name: "Jackson Lee", email: "p@example.com", role: "Member" },
-  { name: "Isabella Nguyen", email: "i@example.com", role: "Member" },
-];
 
 export default function Home() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friends.value);
   const [selectedChat, setSelectedChat] = useState(null);
@@ -56,7 +54,7 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const [filteredFriend, setFilteredFriend] = useState(friends);
   const [loading, setLoading] = useState(false);
-
+  const [activePage, setActivePage] = useState("chat");
   const [isMobile, setIsMobile] = useState(false);
   const [currentUserId, setCurrentUserId] = useState("");
   const [message, setMessage] = useState(""); // message send input field
@@ -74,7 +72,7 @@ export default function Home() {
   useEffect(() => {
     if (messages.length > 0) return
     if (selectedChat) {
-      getMessages(selectedChat._id,dispatch,setMessages);
+      getMessages(selectedChat._id, dispatch, setMessages);
     }
   }, [selectedChat]);
 
@@ -104,7 +102,7 @@ export default function Home() {
     return filtered.length > 0;
   };
 
-  
+
 
   const onEmojiClick = (emojiData) => {
     setMessage((prev) => prev + emojiData.emoji);
@@ -174,7 +172,7 @@ export default function Home() {
   useEffect(() => {
     socket.on("connect", () => console.log("Connected to server"));
     socket.on("friendRequestReceived", ({ from, message, senderInfo }) => {
-      CustomToast(socket, from, message, senderInfo, getFriends,setFilteredFriend,dispatch);
+      CustomToast(socket, from, message, senderInfo, getFriends, setFilteredFriend, dispatch);
     });
     socket.on("notification", (data) => {
       if (data.message) {
@@ -241,7 +239,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center space-y-6 text-gray-400 text-lg mt-6">
             <button className="hover:text-white" title="Chats">
-              <FontAwesomeIcon icon={faPaperPlane} />
+              <FontAwesomeIcon icon={faPaperPlane} onClick={()=>setActivePage('chat')}/>
             </button>
             <button className="hover:text-white" title="Groups">
               <FontAwesomeIcon icon={faVideo} />
@@ -252,10 +250,10 @@ export default function Home() {
           </div>
 
           <div className="mt-auto mb-6 flex flex-col items-center space-y-6 text-gray-400 text-lg">
-            <button className="hover:text-white" title="Settings">
-              <FontAwesomeIcon icon={faGear} />
+            <button className="hover:text-white cursor-pointer" title="Settings">
+              <FontAwesomeIcon onClick={() => setActivePage('settings')} icon={faGear} />
             </button>
-            <button onClick={()=>handleLogout(toast)} className="hover:text-white cursor-pointer" title="Logout">
+            <button onClick={() => handleLogout(toast)} className="hover:text-white cursor-pointer" title="Logout">
               <FontAwesomeIcon icon={faRightFromBracket} />
             </button>
           </div>
@@ -263,7 +261,7 @@ export default function Home() {
         {/* Mobile Bottom Navigation Bar */}
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d0d] border-t border-gray-800 flex justify-around items-center py-2 md:hidden">
           <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Chats">
-            <FontAwesomeIcon icon={faPaperPlane} className="text-xl" />
+            <FontAwesomeIcon icon={faPaperPlane} className="text-xl" onClick={()=>setActivePage('chat')}/>
             <span className="text-xs">Chats</span>
           </button>
           <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Groups">
@@ -275,10 +273,10 @@ export default function Home() {
             <span className="text-xs">Calls</span>
           </button>
           <button className="flex flex-col items-center text-gray-400 hover:text-white" title="Settings">
-            <FontAwesomeIcon icon={faGear} className="text-xl" />
-            <span className="text-xs">Settings</span>
+            <FontAwesomeIcon icon={faGear} className="text-xl cursor-pointer" onClick={() => setActivePage('settings')}/>
+            <span className="text-xs" >Settings</span>
           </button>
-          <button onClick={()=>handleLogout(toast)} className="flex flex-col items-center text-gray-400 hover:text-white" title="Logout">
+          <button onClick={() => handleLogout(toast)} className="flex flex-col items-center text-gray-400 hover:text-white" title="Logout">
             <FontAwesomeIcon icon={faRightFromBracket} className="text-xl" />
             <span className="text-xs">Logout</span>
           </button>
@@ -286,137 +284,112 @@ export default function Home() {
 
 
         {/* Left Panel */}
+
         <div
           className={`absolute md:static w-full md:w-1/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat && isMobile
             ? "-translate-x-full opacity-0"
             : "translate-x-0 opacity-100"
             }`}
         >
-          <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
-            {/* Search Bar */}
-            <div className="p-4 border-b border-gray-800 relative">
-              <div className="flex justify-between">
-                <h2 className="text-lg font-semibold mb-4">Rope Messenger</h2>
-              </div>
+          {renderView(activePage)}
+          {activePage === "chat" &&
+            <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
+              {/* Search Bar */}
+              <div className="p-4 border-b border-gray-800 relative">
+                <div className="flex justify-between">
+                  <h2 className="text-lg font-semibold mb-4">Rope Messenger</h2>
+                </div>
 
-              <div className="p-4 relative">
-                <input
-                  type="text"
-                  placeholder="Search chats..."
-                  className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                  onChange={(e) => setUserName(e.target.value)}
-                  value={userName}
-                />
-                {/* Search Results */}
-                {userName && (
-                  <div>
-                    {loading ? (
-                      <div className="flex justify-center items-center p-4">
-                        <Loader />
-                      </div>
-                    ) : (
-                      users.length > 0 && (
-                        <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                          {users.map((user, i) => (
-                            <div
-                              key={user._id}
-                              // key={`search-${i}`}
-                              className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                              onClick={() => {
-                                setSelectedChat(user);
-                                setUserName("");
-                                setUsers([]);
-                              }}
-                            >
-                              <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" />
-                                <AvatarFallback>CN</AvatarFallback>
-                              </Avatar>
-                              <div className="min-w-0">
-                                <p className="font-medium truncate">
-                                  {user.name}
-                                </p>
-                                <p className="text-sm text-gray-400 truncate">
-                                  {user.userName}
-                                </p>
-                              </div>
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addFriend(user._id,toast);
-                                }}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
-                              >
-                                Add
-                              </Button>
-                            </div>
-                          ))}
+                <div className="p-4 relative">
+                  <input
+                    type="text"
+                    placeholder="Search chats..."
+                    className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
+                    onChange={(e) => setUserName(e.target.value)}
+                    value={userName}
+                  />
+                  {/* Search Results */}
+                  {userName && (
+                    <div>
+                      {loading ? (
+                        <div className="flex justify-center items-center p-4">
+                          <Loader />
                         </div>
-                      )
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Chats & Friends */}
-            <div className="p-4 overflow-y-auto">
-              <h2 className="text-lg font-semibold mb-4">Chats</h2>
-
-              {/* Always show filtered friends */}
-              <div className="space-y-4">
-                {filteredFriend.map((friend, i) => (
-                  <div
-                    // key={`friend-${i}`}
-                    key={friend._id}
-                    className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
-                    onClick={() => setSelectedChat(friend)}
-                  >
-                    <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{friend.name}</p>
-                      <p className="text-sm text-gray-400 truncate">
-                        {friend.userName}
-                      </p>
+                      ) : (
+                        users.length > 0 && (
+                          <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            {users.map((user, i) => (
+                              <div
+                                key={user._id}
+                                // key={`search-${i}`}
+                                className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                                onClick={() => {
+                                  setSelectedChat(user);
+                                  setUserName("");
+                                  setUsers([]);
+                                }}
+                              >
+                                <Avatar>
+                                  <AvatarImage src="https://github.com/shadcn.png" />
+                                  <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                  <p className="font-medium truncate">
+                                    {user.name}
+                                  </p>
+                                  <p className="text-sm text-gray-400 truncate">
+                                    {user.userName}
+                                  </p>
+                                </div>
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addFriend(user._id, toast);
+                                  }}
+                                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs"
+                                >
+                                  Add
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      )}
                     </div>
-                  </div>
-                ))}
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Groups */}
-            <div className="p-4 overflow-y-auto">
-              <h2 className="text-lg font-semibold mb-4">Groups</h2>
-              <div className="p-4">
-                <input
-                  type="text"
-                  placeholder="Search groups..."
-                  className="w-full p-3 bg-[#2a2a2a] border border-gray-700 text-white rounded-md outline-none"
-                />
-              </div>
-              <div className="space-y-4">
-                {members.map((member, i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-600" />
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{member.name}</p>
-                      <p className="text-sm text-gray-400 truncate">
-                        {member.email}
-                      </p>
+              {/* Chats & Friends */}
+              <div className="p-4 overflow-y-auto">
+                <h2 className="text-lg font-semibold mb-4">Chats</h2>
+
+                {/* Always show filtered friends */}
+                <div className="space-y-4">
+                  {filteredFriend.map((friend, i) => (
+                    <div
+                      // key={`friend-${i}`}
+                      key={friend._id}
+                      className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-2 rounded-md"
+                      onClick={() => setSelectedChat(friend)}
+                    >
+                      <Avatar>
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="font-medium truncate">{friend.name}</p>
+                        <p className="text-sm text-gray-400 truncate">
+                          {friend.userName}
+                        </p>
+                      </div>
                     </div>
-                    <span className="ml-auto text-xs text-gray-500">
-                      {member.role}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          }
         </div>
-
         {/* Right Panel (Chat Window) */}
         <div
           className={`absolute md:static w-full md:w-2/3 h-full transition-all duration-500 ease-in-out transform ${selectedChat
@@ -532,7 +505,7 @@ export default function Home() {
                   value={message}
                 />
                 <button
-                  onClick={()=>sendMessage(socket, setMessage, message, selectedChat._id)}
+                  onClick={() => sendMessage(socket, setMessage, message, selectedChat._id)}
                   className="bg-blue-600 hover:bg-blue-700 p-3 rounded-r-md text-white cursor-pointer"
                 >
                   <FontAwesomeIcon icon={faPaperPlane} />
