@@ -289,8 +289,8 @@ export default function Home() {
         {activePage === "chat" &&
           <div className="relative flex h-[95vh] w-full max-w-6xl overflow-hidden rounded-r-xl bg-[#1a1a1a] text-white shadow-lg">
             <div
-  className={`absolute md:static w-full md:w-1/3 h-full z-10 bg-[#111] ${selectedChat && isMobile ? "hidden" : "block"}`}
->
+              className={`absolute md:static w-full md:w-1/3 h-full z-10 bg-[#111] ${selectedChat && isMobile ? "hidden" : "block"}`}
+            >
 
               <div className="flex flex-col h-full border-r border-gray-800 bg-[#111]">
                 {/* Search Bar */}
@@ -390,8 +390,8 @@ export default function Home() {
             </div>
             {/* Right Panel (Chat Window) */}
             <div
-  className={`absolute md:static w-full md:w-2/3 h-full z-20 bg-[#1a1a1a] transition-all duration-500 ease-in-out transform ${selectedChat || !isMobile ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"}`}
->
+              className={`absolute md:static w-full md:w-2/3 h-full z-20 bg-[#1a1a1a] transition-all duration-500 ease-in-out transform ${selectedChat || !isMobile ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 md:opacity-100"}`}
+            >
 
               {selectedChat && (
                 <div className="flex flex-col h-full p-4 sm:p-6">
