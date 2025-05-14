@@ -6,10 +6,10 @@ const roomSchema = new Schema({
         type: String,
         required: true,
     },
-    roomId: {
+    roomId:{
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     roomAdmin: {
         type: mongoose.Schema.Types.ObjectId,

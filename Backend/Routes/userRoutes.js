@@ -93,4 +93,7 @@ router.delete('/deleteMessage/:messageId', authenticateToken, deleteMessage)
  */
 router.post('/getUserByUserName', authenticateToken, getUserByUserName)
 
+
+router.post
+
 module.exports = router;

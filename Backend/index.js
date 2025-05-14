@@ -11,7 +11,8 @@ const {chatSockets} = require('./Sockets/chatSockets')
 
 const userRoutes = require('./Routes/userRoutes')
 const makeDbConnection = require('./Configuration/dbConnections');
-const verifyTokenRoute = require('./Routes/verifyTokenRoute')
+const verifyTokenRoute = require('./Routes/verifyTokenRoute');
+const RoomRoutes = require('./Routes/roomRoutes')
 makeDbConnection();
 
 const server = createServer(app); // creating server instance using http module
@@ -48,6 +49,7 @@ app.use(cors({
  */
 app.use('/api', userRoutes);
 app.use('/api', verifyTokenRoute)
+app.use('/api', RoomRoutes)
 
 
 
