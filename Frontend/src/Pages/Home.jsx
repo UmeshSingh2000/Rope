@@ -228,6 +228,21 @@ export default function Home() {
     }
   }, [messages]);
 
+
+
+  useEffect(() => {
+    const handleStatusChange = ({ userName, status }) => {
+      console.log(`User ${userName} is now ${status ? 'online' : 'offline'}`);
+    };
+
+    socket.on('userStatusChanged', handleStatusChange);
+
+    // Cleanup to avoid duplicate listeners
+    return () => {
+      socket.off('userStatusChanged', handleStatusChange);
+    };
+  }, [socket]);
+
   return (
     <div className="flex h-screen items-center justify-center bg-black px-2">
 

@@ -1,4 +1,5 @@
 const Room = require("../models/roomSchema")
+const User = require("../models/userSchema")
 const crypto = require("crypto")
 const createRoom = async (req, res) => {
     try {
@@ -8,6 +9,7 @@ const createRoom = async (req, res) => {
             return res.status(400).json({ error: "Room name is required" });
         }
         const roomId = crypto.randomBytes(16).toString("hex");
+
         const newRoom = new Room({
             roomName,
             roomAdmin: id,
@@ -19,36 +21,53 @@ const createRoom = async (req, res) => {
                 }
             ]
         })
-        await newRoom.save()
-        return res.status(201).json({ message: "Room created successfully" });
+        const savedRoom = await newRoom.save()
+        await User.findByIdAndUpdate(id, { // add the roomId to the user
+            $addToSet: {
+                roomJoined: savedRoom._id
+            }
+        })
+        return res.status(201).json({
+            message: "Room created successfully",
+            room: {
+                _id: savedRoom._id,
+                roomId: savedRoom.roomId,
+                roomName: savedRoom.roomName,
+                roomAdmin: savedRoom.roomAdmin
+            }
+        });
     }
-    catch(err){
+    catch (err) {
         return res.status(500).json({ error: "Internal server error" });
     }
 }
 
-const roomAddUsers = async({roomId,userId})=>{
-    try{
-
-        if(!roomId || !userId) {
+const roomAddUsers = async ({ roomId, userId }) => {
+    try {
+        if (!roomId || !userId) {
             return { error: "Room name and user ID are required" };
         }
         const room = await Room.findOne({ roomId });
         if (!room) {
             return { error: "Room not found" };
         }
-        const user = room.roomMembers.some(member=>member.userId.toString() === userId);
-        if(user) {
+        const user = room.roomMembers.some(member => member.userId.toString() === userId);
+        if (user) {
             return { error: "User already in room" };
         }
         room.roomMembers.push({
             userId,
             joinedAt: new Date()
         })
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: {
+                roomJoined: room._id
+            }
+        })
         await room.save();
         return { message: "User added to room successfully" };
     }
-    catch(err){
+    catch (err) {
         return { error: "Internal server error" };
     }
 }

@@ -262,7 +262,7 @@ const getUserByUserName = async (req, res) => {
     if (!userName) {
       return res.status(400).json({ message: "UserName is required" })
     }
-    
+
     const user = await User.findOne({ userName: { $regex: new RegExp(`^${userName}`, 'i') } }, { password: 0, createdAt: 0, updatedAt: 0, OTP: 0, OTPExpiresIn: 0 });
     if (!user) {
       return res.status(404).json({ message: "User with this User Name does not exist" })
@@ -330,7 +330,7 @@ const addFriend = async (req, res) => {
     const alreadyExistsForReceiver = friendFriendsList.friendsList.find(
       (friend) => friend.friendId.toString() === userId
     );
-    
+
 
     if (!alreadyExistsForReceiver) {
       friendFriendsList.friendsList.push({
@@ -382,8 +382,13 @@ const getMyFriends = async (req, res) => {
   }
 }
 
+/**
+ * @description User Logout
+ * @route GET api/logout
+ * @access Private
+ */
 
-const userLogout = (req,res)=>{
+const userLogout = (req, res) => {
   try {
     res.clearCookie('token', {
       httpOnly: true,
@@ -397,6 +402,23 @@ const userLogout = (req,res)=>{
   }
 }
 
+
+const setUserOnlineStatus = async (userId, status) => {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    user.isOnline = status;
+    await user.save();
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 
 
 
@@ -417,5 +439,6 @@ module.exports = {
   getUserByUserName,
   addFriend,
   getMyFriends,
-  userLogout
+  userLogout,
+  setUserOnlineStatus
 };

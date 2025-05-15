@@ -1,7 +1,7 @@
-const mongoose= require("mongoose");
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    userName:{
+    userName: {
         type: String,
         required: true,
         unique: true,
@@ -29,11 +29,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    roomJoined: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Room'
+    },
     OTPExpiresIn: {
         type: Date,
         default: null
-      }
+    },
+    isOnline: {
+        type: Boolean,
+        default: false
+    }
 }, { timestamps: true });
 
-const User=mongoose.model("User",userSchema);
-module.exports=User;
+const User = mongoose.model("User", userSchema);
+module.exports = User;
