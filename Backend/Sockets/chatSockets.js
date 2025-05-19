@@ -23,7 +23,7 @@ const chatSockets = (io) => {
                 { upsert: true, new: true }
             )
             await setUserOnlineStatus(socket.user.id, true);
-            io.emit('userStatusChanged', { // notify the user online status
+            socket.broadcast.emit('userStatusChanged', { // notify the user online status
                 userId: socket.user.id,
                 userName: socket.user.name,
                 status: true
@@ -40,7 +40,7 @@ const chatSockets = (io) => {
             try {
                 console.log('User disconnected', socket.id, socket.user.name)
                 await setUserOnlineStatus(socket.user.id, false); // set user offline
-                io.emit('userStatusChanged', {
+                socket.broadcast.emit('userStatusChanged', {
                     userId: socket.user.id,
                     userName: socket.user.name,
                     status: false

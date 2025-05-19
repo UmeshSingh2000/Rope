@@ -43,7 +43,6 @@ const URL = import.meta.env.VITE_BACKENDAPI_URL;
 
 
 export default function Home() {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friends.value);
   const [selectedChat, setSelectedChat] = useState(null);
@@ -230,7 +229,7 @@ export default function Home() {
 
 
 
-  useEffect(() => {
+  useEffect(() => { // later integrate this 
     const handleStatusChange = ({ userName, status }) => {
       console.log(`User ${userName} is now ${status ? 'online' : 'offline'}`);
     };
@@ -332,7 +331,7 @@ export default function Home() {
                         ) : (
                           users.length > 0 && (
                             <div className="absolute z-20 mt-2 w-[calc(100%-2rem)] bg-[#1f1f1f] border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                              {users.map((user, i) => (
+                              {users.map((user) => (
                                 <div
                                   key={user._id}
                                   // key={`search-${i}`}
@@ -380,7 +379,7 @@ export default function Home() {
 
                   {/* Always show filtered friends */}
                   <div className="space-y-4">
-                    {filteredFriend.map((friend, i) => (
+                    {filteredFriend.map((friend) => (
                       <div
                         // key={`friend-${i}`}
                         key={friend._id}
